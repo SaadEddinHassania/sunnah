@@ -256,8 +256,8 @@
 }
 
 .app-container .side-body{
-  margin-left: 45px;
-  margin-right: -15px;
+  margin-right: 45px;
+  margin-left: -15px;
 }
 
 .navbar .navbar-nav > li > a{
@@ -475,7 +475,7 @@ p#the_plugin_name{
 .app-container .content-container .side-menu .navbar-header .navbar-brand .icon {
     font-size: 26px;
     top: 3px;
-    position: relative;
+    /*position: relative;*/
 }
 
 .app-container.expanded .content-container .side-menu .navbar-header .navbar-brand .title{
@@ -554,8 +554,8 @@ overflow-x: hidden;
   display:block;
   border-radius:10px;
   top:50%;
-  left:50%;
-  margin-left:-10px;
+  right:50%;
+  margin-right:-10px;
   margin-top:-1px;
   position:absolute;
   transition:opacity 0.6s ease;
@@ -657,7 +657,7 @@ overflow-x: hidden;
 }
 
 .navbar .dropdown.profile .dropdown-menu h5, .navbar .dropdown.profile .dropdown-menu h6{
-  float:left;
+  float:right;
 }
 
 .navbar .dropdown.profile .dropdown-menu h6{
@@ -675,7 +675,7 @@ overflow-x: hidden;
 }
 
 .navbar .dropdown.profile .dropdown-menu h5{
-float: left;
+float: right;
     margin-bottom: 5px;
     margin-top: 12px;
   }
@@ -689,13 +689,15 @@ float: left;
     line-height: 1.42857143;
     color: #777;
     white-space: nowrap;
-    text-align: left;
+    text-align: right;
     transition:color 0.3s ease;
 }
 
 .dropdown-menu>li>a i{
   position:relative;
   top:2px;
+  float: right;
+  padding-left: 5px;
 }
 
 .dropdown-menu .divider{
@@ -714,7 +716,7 @@ float: left;
 }
 
 .navbar .dropdown.profile .dropdown-menu .profile-body{
-  padding-left:10px;
+  padding-right:10px;
 }
 
 .navbar .open .dropdown-menu.dropdown-menu-animated {
@@ -728,14 +730,14 @@ float: left;
 .navbar .dropdown.profile .dropdown-menu li.profile-img img.profile-img{
   height: 60px;
     width: 60px;
-    float:left;
+    float:right;
     border-radius:50%;
-    margin-right:10px;
+    margin-left:10px;
 }
 
 .page-title .btn.btn-success{
   position:relative;
-  left:15px;
+  right:15px;
   top:-1px;
 }
 
@@ -770,7 +772,7 @@ table.dataTable.no-footer{
 }
 
 .site-footer-right{
-  padding-right:20px;
+  padding-right:64px;
 }
 
 .form-control{
@@ -1035,23 +1037,23 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#242c32', end
 
 .app-container  .side-menu .panel.widget .avatar{
     width: 40px;
-    float:left;
-    margin-left:10px;
+    float:right;
+    margin-right:10px;
     border:2px solid rgba(51,59,69, 0.5);
 }
 
 .app-container .side-menu .panel.widget h4 {
-    float: left;
+    float: right;
     display: block;
     position: absolute;
-    left: 60px;
+    right: 60px;
     top: -7px;
     width: 190px;
-    text-align: left;
+    text-align: right;
     opacity:0;
     transition:opacity 0.3s ease;
     margin-top: 17px;
-    left: 56px;
+    right: 56px;
     overflow: hidden;
     height: 26px;
 }
@@ -1065,8 +1067,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#242c32', end
 }
 
 .app-container .side-menu:hover .panel.widget .avatar{
-  float:left;
-  margin-left:10px;
+  float:right;
+  margin-right:10px;
   transition:none;
 }
 

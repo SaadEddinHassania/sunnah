@@ -40,11 +40,11 @@
 					      				</td>
 					      			@endforeach
 					      			<td class="no-sort no-click">
-										<div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}">
+										<div class="btn-sm btn-danger pull-left delete" data-id="{{ $data->id }}">
 											<i class="voyager-trash"></i> Delete
 										</div>
-										<a href="{{ route($dataType->slug.'.edit', $data->id) }}" class="btn-sm btn-primary pull-right edit"><i class="voyager-edit"></i> Edit</a>
-										<a href="{{ route($dataType->slug.'.show', $data->id) }}" class="btn-sm btn-warning pull-right"><i class="voyager-eye"></i> View</a>
+										<a href="{{ route($dataType->slug.'.edit', $data->id) }}" class="btn-sm btn-primary pull-left edit"><i class="voyager-edit"></i> Edit</a>
+										<a href="{{ route($dataType->slug.'.show', $data->id) }}" class="btn-sm btn-warning pull-left" style="margin-left: 5px"><i class="voyager-eye"></i> View</a>
 									</td>
 					      		</tr>
 					      	@endforeach
