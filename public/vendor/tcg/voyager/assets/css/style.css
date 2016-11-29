@@ -262,7 +262,7 @@ a:hover {
           .app-container .content-container .side-menu .navbar-nav li a .title {
             width: 0px;
             white-space: nowrap;
-            padding-left: 6px;
+            padding-right: 6px;
             display: none; }
       .app-container .content-container .side-menu .navbar-nav li.dropdown {
         border: 0;
@@ -277,7 +277,7 @@ a:hover {
         .app-container .content-container .side-menu .navbar-nav li.dropdown > a:after {
           content: "";
           position: absolute;
-          right: 1em; }
+          left: 1em; }
       .app-container .content-container .side-menu .navbar-nav .panel-collapse.in {
         display: none; }
     .app-container .content-container .side-menu:hover {
@@ -292,7 +292,7 @@ a:hover {
         font-family: Voyager;
         content: "\e038";
         position: absolute;
-        right: 1em; }
+        left: 1em; }
       .app-container .content-container .side-menu:hover .panel-collapse.in {
         display: block; }
     .app-container .content-container .side-body {
@@ -545,7 +545,7 @@ table#dataTable thead th{
     margin-bottom: 0; }
 
     .modal .modal-dialog .modal-footer .btn.btn-default{
-      margin-right:10px;
+      margin-left:10px;
     }
 
 .modal-backdrop {

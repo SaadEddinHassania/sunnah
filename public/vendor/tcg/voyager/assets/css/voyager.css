@@ -813,9 +813,9 @@ table.dataTable.no-footer{
 .panel-title {
     display: block;
     padding: 20px 30px;
-    padding-left:15px;
+    padding-right:15px;
     font-size: 18px;
-    text-align:left;
+    text-align:right;
 }
 
 .panel-footer{

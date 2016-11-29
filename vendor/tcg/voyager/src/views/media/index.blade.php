@@ -13,7 +13,7 @@
             <div class="col-md-12">
 
                 <div class="admin-section-title">
-                    <h3><i class="voyager-images"></i> Media</h3>
+                    <h3>Media <i class="voyager-images"></i></h3>
                 </div>
                 <div class="clear"></div>
 
@@ -62,7 +62,7 @@
                                 </template>
                             </ol>
 
-                            <div class="toggle"><span>Close</span><i class="voyager-double-right"></i></div>
+                            <div class="toggle"><span>Close</span><i class="voyager-double-left"></i></div>
                         </div>
                         <div class="flex">
 
