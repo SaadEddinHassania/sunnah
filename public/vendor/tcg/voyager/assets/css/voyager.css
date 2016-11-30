@@ -511,6 +511,7 @@ p#the_plugin_name{
 
 .flat-blue .side-menu.sidebar-inverse .navbar{
   background:none;
+  width: 100%;
 }
 
 .flat-blue .side-menu.sidebar-inverse{
