@@ -43,15 +43,3 @@ $(function() {
     return $(".side-menu .nav .dropdown .collapse").collapse('hide');
   });
 });
-
-$('#dataTable').DataTable({
-  "oLanguage": {
-    "sSearch": "بحث: ",
-    "oPaginate": {
-      "sNext": "التالي",
-      "sPrevious": "السابق",
-      "sInfo": "Got a total of _TOTAL_ entries to show (_START_ to _END_)"
-    }
-  },
-  "sDom": '<"top"fl>rt<"bottom pull-left"p><"bottom pull-right"i><"clear">'
-});

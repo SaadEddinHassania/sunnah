@@ -8,6 +8,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/SaadEddinHassania/JasperPHP.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/SaadEddinHassania/voyager.git"
         }
     ],
     "require": {
