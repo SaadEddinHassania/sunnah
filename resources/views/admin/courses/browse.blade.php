@@ -36,6 +36,8 @@
                                             @if($row->type == 'image')
                                                 <img src="@if( strpos($data->{$row->field}, 'http://') === false && strpos($data->{$row->field}, 'https://') === false){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif"
                                                      style="width:100px">
+                                            @elseif($row->type == 'select_dropdown')
+                                                {{ getNameById($row->field, $data->{$row->field}) }}
                                             @else
                                                 {{ $data->{$row->field} }}
                                             @endif

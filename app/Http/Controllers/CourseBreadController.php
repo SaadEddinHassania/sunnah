@@ -2,6 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course_Field;
+use App\Models\Course_Type;
+use App\Models\Region;
+use App\Models\Supervisor;
+use App\Models\Teacher;
+use App\Models\Venue;
+use Illuminate\Contracts\Logging\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -38,13 +45,17 @@ class CourseBreadController extends Controller
 
         $view = 'voyager::bread.browse';
 
+        $course_con = $this->getSupervisorNameById(0);
+
+        error_log($dataTypeContent);
+
         if (view()->exists("admin.$slug.browse")) {
             $view = "admin.$slug.browse";
         } elseif (view()->exists("voyager::$slug.browse")) {
             $view = "voyager::$slug.browse";
         }
 
-        return view($view, compact('dataType', 'dataTypeContent'));
+        return view($view, compact('dataType', 'dataTypeContent', 'this->getSupervisorNameById'));
     }
 
     //***************************************
@@ -68,7 +79,7 @@ class CourseBreadController extends Controller
             ? call_user_func([$dataType->model_name, 'find'], $id)
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
 
-        return view('voyager::bread.read', compact('dataType', 'dataTypeContent'));
+        return view('admin.courses.read', compact('dataType', 'dataTypeContent'));
     }
 
     //***************************************
@@ -91,6 +102,16 @@ class CourseBreadController extends Controller
             ? call_user_func([$dataType->model_name, 'find'], $id)
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
 
+        $options_ = array(
+            'supervisor' => Supervisor::toDropDown(),
+            'teacher' => Teacher::toDropDown(),
+            'region' => Region::toDropDown(),
+            'venue' => Venue::toDropDown(),
+            'field' => Course_Field::toDropDown(),
+            'type' => Course_Type::toDropDown()
+        );
+        $options_ = json_encode($options_);
+
         $view = 'voyager::bread.edit-add';
 
         if (view()->exists("admin.$slug.edit-add")) {
@@ -99,7 +120,7 @@ class CourseBreadController extends Controller
             $view = "voyager::$slug.edit-add";
         }
 
-        return view($view, compact('dataType', 'dataTypeContent'));
+        return view($view, compact('dataType', 'dataTypeContent', 'options_'));
     }
 
     // POST BR(E)AD
@@ -137,10 +158,18 @@ class CourseBreadController extends Controller
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         $options_ = array(
-            'supervisor' => [5 => 'asd', 6 => 'ads', 2 => 'asdfd'],
-            'teacher' => [30 => 'kluik', 20 => 'jyj', 10 => 'hyyhj']
+            'supervisor' => Supervisor::toDropDown(),
+            'teacher' => Teacher::toDropDown(),
+            'region' => Region::toDropDown(),
+            'venue' => Venue::toDropDown(),
+            'field' => Course_Field::toDropDown(),
+            'type' => Course_Type::toDropDown()
         );
         $options_ = json_encode($options_);
+
+//        error_log($options_['supervisor']);
+
+        $sn = 77;
 
         $view = 'voyager::bread.edit-add';
 
@@ -150,7 +179,7 @@ class CourseBreadController extends Controller
             $view = "voyager::$slug.edit-add";
         }
 
-        return view($view, compact('dataType', 'options_'));
+        return view($view, compact('dataType', 'options_', 'sn'));
     }
 
     // POST BRE(A)D
@@ -165,6 +194,7 @@ class CourseBreadController extends Controller
         }
 
         $data = new $dataType->model_name();
+
         $this->insertUpdateData($request, $slug, $dataType->addRows, $data);
 
         return redirect()
@@ -376,6 +406,11 @@ class CourseBreadController extends Controller
         if (Storage::exists($path)) {
             Storage::delete($path);
         }
+    }
+
+    public function getSupervisorNameById($id)
+    {
+        return 'asdasd';
     }
 }
 

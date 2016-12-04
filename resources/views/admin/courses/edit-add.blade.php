@@ -39,12 +39,27 @@
 
                             @foreach($dataType->addRows as $row)
                                 <div class="form-group">
-                                    <label for="name">{{ $row->display_name }}</label>
-
+                                    @if($row->type == "hidden" && !isset($dataTypeContent->id))
+                                        <input type="hidden" class="form-control" name="{{ $row->field }}" ,
+                                               value="{{$sn}}">
+                                    @else
+                                        <label for="name">{{ $row->display_name }}</label>
+                                    @endif
                                     @if($row->type == "text")
                                         <input type="text" class="form-control" name="{{ $row->field }}"
                                                placeholder="{{ $row->display_name }}"
                                                value="@if(isset($dataTypeContent->{$row->field})){{ old($row->field, $dataTypeContent->{$row->field}) }}@else{{old($row->field)}}@endif">
+
+                                    @elseif($row->type == "date")
+                                        <input type="date" class="form-control" name="{{ $row->field }}"
+                                               placeholder="{{ $row->display_name }}"
+                                               value="@if(isset($dataTypeContent->{$row->field})){{ old($row->field, $dataTypeContent->{$row->field}) }}@else{{old($row->field)}}@endif">
+
+                                    @elseif($row->type == "hidden" && isset($dataTypeContent->id))
+                                        <input type="text" class="form-control" name="{{ $row->field }}" ,
+                                               value="@if(isset($dataTypeContent->{$row->field})){{ old($row->field, $dataTypeContent->{$row->field}) }}@else{{old($row->field)}}@endif"
+                                        readonly>
+
                                     @elseif($row->type == "password")
                                         @if(isset($dataTypeContent->{$row->field}))
                                             <br>
