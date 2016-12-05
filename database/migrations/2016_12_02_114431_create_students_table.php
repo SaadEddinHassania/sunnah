@@ -24,6 +24,7 @@ class CreateStudentsTable extends Migration
             $table->string('mobile')->nullanle();
             $table->date('dob')->nullanle();
             $table->string('address')->nullanle();
+            $table->timestamps();
 
         });
     }
