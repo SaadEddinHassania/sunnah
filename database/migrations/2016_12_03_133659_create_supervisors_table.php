@@ -14,11 +14,22 @@ class CreateSupervisorsTable extends Migration
     public function up()
     {
         Schema::create('supervisors', function (Blueprint $table) {
+            $table->increments('id');
+
             $table->integer('user_id')->unsigned()->index();
-            $table->string('type');
-            $table->primary('user_id');
-            
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->integer('region_id')->unsigned()->index();
+            $table->foreign('region_id')->references('id')->on('regions')->onDelete('RESTRICT');
+
+            $table->integer('role_id')->unsigned()->index();
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('RESTRICT');
+
+            $table->string('personal_id');
+            $table->string('mobile');
+            $table->date('dob');
+            $table->string('address');
+
         });
     }
 

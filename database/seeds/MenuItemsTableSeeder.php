@@ -46,21 +46,7 @@ class MenuItemsTableSeeder extends Seeder
                 'created_at' => '2016-05-31 22:18:08',
                 'updated_at' => '2016-06-01 20:24:01',
             ),
-            2 => 
-            array (
-                'id' => 3,
-                'menu_id' => 2,
-                'title' => 'Posts',
-                'url' => "/{$prefix}/posts",
-                'target' => '_self',
-                'icon_class' => 'voyager-news',
-                'color' => NULL,
-                'parent_id' => NULL,
-                'order' => 6,
-                'created_at' => '2016-05-31 22:18:37',
-                'updated_at' => '2016-06-01 16:51:43',
-            ),
-            3 => 
+            2 =>
             array (
                 'id' => 4,
                 'menu_id' => 2,
@@ -74,35 +60,8 @@ class MenuItemsTableSeeder extends Seeder
                 'created_at' => '2016-05-31 22:19:16',
                 'updated_at' => '2016-05-31 22:20:07',
             ),
-            4 => 
-            array (
-                'id' => 5,
-                'menu_id' => 2,
-                'title' => 'Categories',
-                'url' => "/{$prefix}/categories",
-                'target' => '_self',
-                'icon_class' => 'voyager-categories',
-                'color' => NULL,
-                'parent_id' => NULL,
-                'order' => 8,
-                'created_at' => '2016-05-31 22:19:38',
-                'updated_at' => '2016-06-01 20:07:46',
-            ),
-            5 => 
-            array (
-                'id' => 6,
-                'menu_id' => 2,
-                'title' => 'Pages',
-                'url' => "/{$prefix}/pages",
-                'target' => '_self',
-                'icon_class' => 'voyager-file-text',
-                'color' => NULL,
-                'parent_id' => NULL,
-                'order' => 7,
-                'created_at' => '2016-05-31 22:20:03',
-                'updated_at' => '2016-06-01 16:51:43',
-            ),
-            6 => 
+
+            3 =>
             array (
                 'id' => 7,
                 'menu_id' => 2,

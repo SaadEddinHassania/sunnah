@@ -17,33 +17,8 @@ class DataTypesTableSeeder extends Seeder
         \DB::table('data_types')->delete();
         
         \DB::table('data_types')->insert(array (
-            0 => 
-            array (
-                'id' => 1,
-                'name' => 'posts',
-                'slug' => 'posts',
-                'display_name_singular' => 'Post',
-                'display_name_plural' => 'Posts',
-                'icon' => 'voyager-news',
-                'model_name' => 'TCG\\Voyager\\Models\\Post',
-                'description' => '',
-                'created_at' => '2016-01-27 19:45:51',
-                'updated_at' => '2016-01-28 03:45:51',
-            ),
-            1 => 
-            array (
-                'id' => 3,
-                'name' => 'pages',
-                'slug' => 'pages',
-                'display_name_singular' => 'Page',
-                'display_name_plural' => 'Pages',
-                'icon' => 'voyager-file-text',
-                'model_name' => 'TCG\\Voyager\\Models\\Page',
-                'description' => '',
-                'created_at' => '2016-02-02 02:37:02',
-                'updated_at' => '2016-02-02 02:37:02',
-            ),
-            2 => 
+
+            2 =>
             array (
                 'id' => 4,
                 'name' => 'users',
@@ -56,20 +31,8 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2016-01-27 19:43:51',
                 'updated_at' => '2016-02-03 02:07:20',
             ),
-            3 => 
-            array (
-                'id' => 5,
-                'name' => 'categories',
-                'slug' => 'categories',
-                'display_name_singular' => 'Category',
-                'display_name_plural' => 'Categories',
-                'icon' => 'voyager-categories',
-                'model_name' => 'TCG\\Voyager\\Models\\Category',
-                'description' => '',
-                'created_at' => NULL,
-                'updated_at' => '2016-06-29 00:18:42',
-            ),
-            4 => 
+
+            4 =>
             array (
                 'id' => 6,
                 'name' => 'menus',
@@ -82,7 +45,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2016-06-29 00:09:35',
             ),
-            5 => 
+            5 =>
             array (
                 'id' => 8,
                 'name' => 'roles',
