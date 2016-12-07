@@ -24,10 +24,14 @@ class Student extends Model
             ->pluck('users.name', 'students.user_id');
     }
 
-    public static function getStudentsByCourse($course_id){
-        return Student::join('users', 'students.user_id', 'users.id')
+    public static function getStudentsByCourse($course_id)
+    {
+        $dd = Student::join('users', 'students.user_id', 'users.id')
             ->join('course_students', 'users.id', 'course_students.student_id')
             ->where('course_students.course_id', '=', $course_id)
-            ->pluck('users.name', 'students.user_id');
+            ->select('users.name', 'students.user_id', 'course_students.status', 'course_students.grade')
+            ->get();
+        error_log('data= ' . json_encode($dd));
+        return $dd;
     }
 }

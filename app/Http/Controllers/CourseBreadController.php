@@ -129,6 +129,7 @@ class CourseBreadController extends Controller
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
         $data = call_user_func([$dataType->model_name, 'find'], $id);
+        error_log(json_encode($request->input()));
         $this->insertUpdateData($request, $slug, $dataType->editRows, $data);
 
         return redirect()
@@ -284,13 +285,16 @@ class CourseBreadController extends Controller
         $course_id = $data->id;
         $students = $request->input('students_ids');
         foreach ($students as $id) {
-            error_log("last course id= " . $course_id);
-            error_log("student id= " . $id);
+            Course_Student::updateOrCreate(
+                ['course_id' => $course_id, 'student_id' => $id,]
+            );
 
-            Course_Student::updateOrCreate([
-                'course_id' => $course_id,
-                'student_id' => $id
-            ]);
+            Course_Student::where('course_id', '=', $course_id)
+                ->where('student_id', '=', $id)
+                ->update([
+                    'status' => $request->input('students_grade')[$id][0],
+                    'grade' => $request->input('students_grade')[$id][1]
+                ]);
         }
 
     }

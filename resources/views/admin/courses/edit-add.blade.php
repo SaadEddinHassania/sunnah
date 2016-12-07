@@ -12,7 +12,7 @@
         <i class="{{ $dataType->icon }}"></i> @if(isset($dataTypeContent->id)){{ 'Edit' }}@else{{ 'New' }}@endif {{ $dataType->display_name_singular }}
     </h1>
 @stop
-
+<?php $region_id = 0;?>
 @section('content')
     <div class="page-content container-fluid">
         <div class="row">
@@ -25,7 +25,7 @@
                       method="POST" enctype="multipart/form-data">
 
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-7">
                             <div class="panel panel-body panel-bordered">
 
                                 @if (count($errors) > 0)
@@ -44,6 +44,8 @@
                                             <input type="hidden" class="form-control" id="{{ $row->field }}"
                                                    name="{{ $row->field }}"
                                                    value="@if($row->field == 'sn'){{'1'}}@else{{date("Y")}}@endif">
+                                        @elseif($row->field == 'year')
+
                                         @else
                                             <label for="name">{{ $row->display_name }}</label>
                                         @endif
@@ -59,9 +61,9 @@
 
                                         @elseif($row->type == "hidden" && isset($dataTypeContent->id))
                                             @if($row->field == 'sn')
-                                            <input type="text" class="form-control" name="{{ $row->field }}" ,
-                                                   value="@if(isset($dataTypeContent->{$row->field})){{ old($row->field, $dataTypeContent->{'year'}.'-'.$dataTypeContent->{$row->field}) }}@else{{old($row->field)}}@endif"
-                                                   readonly>
+                                                <input type="text" class="form-control"
+                                                       value="@if(isset($dataTypeContent->{$row->field})){{ old($row->field, $dataTypeContent->{'year'}.'-'.$dataTypeContent->{$row->field}) }}@else{{old($row->field)}}@endif"
+                                                       readonly>
                                             @endif
                                         @elseif($row->type == "password")
                                             @if(isset($dataTypeContent->{$row->field}))
@@ -85,6 +87,11 @@
                                             @endif
                                             <input type="file" name="{{ $row->field }}">
                                         @elseif($row->type == "select_dropdown")
+                                            <?php
+                                            if ($row->field == 'region_id' && isset($dataTypeContent->id)) {
+                                                $region_id = $dataTypeContent->{$row->field};
+                                            }
+                                            ?>
                                             <?php $options = json_decode($options_);?>
                                             <?php $field_name = explode('_', $row->field)[0];?>
                                             <?php $selected_value = (isset($dataTypeContent->{$row->field}) && !empty(old($row->field,
@@ -149,7 +156,7 @@
 
                             </div><!-- panel-body -->
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-5">
                             <div class="panel panel panel-bordered panel-info">
                                 <div class="panel-heading">
                                     <h3 class="panel-title"><i class="icon wb-clipboard"></i> Add Students</h3>
@@ -164,14 +171,49 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
+                                        <table class="table table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">Name</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Grade</th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                    <div class="form-group">
                                         <ul name='students' id="students" class="from-control list-group">
                                             @if(isset($dataTypeContent->id))
                                                 <?php $students = json_decode($options_)->students;?>
-                                                @foreach($students as $key => $value)
+                                                @foreach($students as $s)
+                                                    <?php error_log($s->name);?>
                                                     <li class='list-group-item'>
-                                                        <input type='hidden' name='students_ids[]' value='{{$key}}'/>
-                                                        {{$value}}
+                                                        <input type='hidden' name='students_ids[]'
+                                                               value='{{$s->user_id}}'/>
+                                                        <div class='row'>
+                                                            <div class='col-xs-4 group-student'>
+                                                                <label class='form-control'>{{$s->name}}</label>
+                                                            </div>
+                                                            <div class='col-xs-4 group-student'>
+                                                                <select class='form-control'
+                                                                        name='students_grade[{{$s->user_id}}][]'>
+                                                                    <option value='1' @if($s->status == 1)selected="selected"@endif>aaa</option>
+                                                                    <option value='2' @if($s->status == 2)selected="selected"@endif>bbb</option>
+                                                                    <option value='3' @if($s->status == 3)selected="selected"@endif>ccc</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class='col-xs-4 group-student'>
+                                                                <input class='form-control' type='number'
+                                                                       name='students_grade[{{$s->user_id}}][]'
+                                                                       value="{{$s->grade}}"
+                                                                       placeholder='grade'/>
+                                                            </div>
+                                                        </div>
                                                     </li>
+                                                    {{--<li class='list-group-item'>--}}
+                                                    {{--<input type='hidden' name='students_ids[]' value='{{$key}}'/>--}}
+                                                    {{--{{$value}}--}}
+                                                    {{--</li>--}}
                                                 @endforeach
                                             @endif
                                         </ul>
@@ -207,6 +249,8 @@
 
 @section('javascript')
     <script>
+        var add_student = $('#add_student');
+
         $('document').ready(function () {
 
             @if(isset($dataTypeContent->id))
@@ -225,6 +269,7 @@
                         hidden: true
                     }]
             });
+            getStudentByRegion({{$region_id}});
             @else
                 $('select').select2({
                 theme: "bootstrap",
@@ -247,12 +292,20 @@
             $('.toggleswitch').bootstrapToggle();
         });
 
-        var add_student = $('#add_student');
-
         add_student.on("change", function (e) {
             $('#students').append(
-                    "<li class='list-group-item'> <input type='hidden' name='students_ids[]' value='" + add_student.val() + "'/>"
-                    + add_student.text() + "</li>");
+                    "<li class='list-group-item'> " +
+                    "<input type='hidden' name='students_ids[]' value='" + add_student.val() + "'/>" +
+                    "<div class='row'>" +
+                    "<div class='col-xs-4 group-student'>" +
+                    "<label class='form-control'>" + add_student.text() + "</label></div>" +
+                    "<div class='col-xs-4 group-student'>" +
+                    "<select class='form-control' name='students_grade[" + add_student.val() + "][]'>" +
+                    "<option value='1'>asd</option>" +
+                    "</select></div>" +
+                    "<div class='col-xs-4 group-student'>" +
+                    "<input class='form-control' type='number' name='students_grade[" + add_student.val() + "][]' placeholder='grade'/>" +
+                    "</div></div></li>");
             add_student.val(-1);
         });
 
@@ -285,7 +338,7 @@
                     add_student.select2('destroy');
                     add_student.empty();
                     jQuery.each(data, function (key, val) {
-                        $('#add_student').append($('<option>', {
+                        add_student.append($('<option>', {
                             value: val,
                             text: key
                         }));
@@ -298,7 +351,20 @@
                 });
 
             }
+        }
 
+        function getStudentByRegion(reg_id) {
+            $.get("/admin/studentsR/" + reg_id, function (data) {
+                add_student.select2('destroy');
+                add_student.empty();
+                jQuery.each(data, function (key, val) {
+                    add_student.append($('<option>', {
+                        value: val,
+                        text: key
+                    }));
+                });
+                setDropDown();
+            });
         }
     </script>
     <script src="{{ config('voyager.assets_path') }}/lib/js/tinymce/tinymce.min.js"></script>
