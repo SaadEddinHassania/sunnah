@@ -29,6 +29,7 @@ class CreateSupervisorsTable extends Migration
             $table->string('mobile');
             $table->date('dob');
             $table->string('address');
+            $table->timestamps();
 
         });
     }
