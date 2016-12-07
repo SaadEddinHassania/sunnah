@@ -58,6 +58,19 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2016-10-21 22:09:45',
                 'updated_at' => '2016-10-21 22:09:45',
             ),
+            6 =>
+                array (
+                    'id' => 9,
+                    'name' => 'courses',
+                    'slug' => 'courses',
+                    'display_name_singular' => 'Course',
+                    'display_name_plural' => 'Courses',
+                    'icon' => 'voyager-receipt',
+                    'model_name' => 'App\\Models\\Course',
+                    'description' => '',
+                    'created_at' => '2016-10-21 22:09:45',
+                    'updated_at' => '2016-10-21 22:09:45',
+                ),
         ));
         
         

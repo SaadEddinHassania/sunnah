@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Course_Field;
+use App\Models\Course_Student;
 use App\Models\Course_Type;
 use App\Models\Region;
+use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\Teacher;
 use App\Models\Venue;
@@ -45,17 +48,13 @@ class CourseBreadController extends Controller
 
         $view = 'voyager::bread.browse';
 
-        $course_con = $this->getSupervisorNameById(0);
-
-        error_log($dataTypeContent);
-
         if (view()->exists("admin.$slug.browse")) {
             $view = "admin.$slug.browse";
         } elseif (view()->exists("voyager::$slug.browse")) {
             $view = "voyager::$slug.browse";
         }
 
-        return view($view, compact('dataType', 'dataTypeContent', 'this->getSupervisorNameById'));
+        return view($view, compact('dataType', 'dataTypeContent'));
     }
 
     //***************************************
@@ -108,7 +107,8 @@ class CourseBreadController extends Controller
             'region' => Region::toDropDown(),
             'venue' => Venue::toDropDown(),
             'field' => Course_Field::toDropDown(),
-            'type' => Course_Type::toDropDown()
+            'type' => Course_Type::toDropDown(),
+            'students' => Student::getStudentsByCourse($dataTypeContent->id)
         );
         $options_ = json_encode($options_);
 
@@ -167,10 +167,6 @@ class CourseBreadController extends Controller
         );
         $options_ = json_encode($options_);
 
-//        error_log($options_['supervisor']);
-
-        $sn = 77;
-
         $view = 'voyager::bread.edit-add';
 
         if (view()->exists("admin.$slug.edit-add")) {
@@ -179,7 +175,7 @@ class CourseBreadController extends Controller
             $view = "voyager::$slug.edit-add";
         }
 
-        return view($view, compact('dataType', 'options_', 'sn'));
+        return view($view, compact('dataType', 'options_'));
     }
 
     // POST BRE(A)D
@@ -284,6 +280,19 @@ class CourseBreadController extends Controller
         $this->validate($request, $rules);
 
         $data->save();
+
+        $course_id = $data->id;
+        $students = $request->input('students_ids');
+        foreach ($students as $id) {
+            error_log("last course id= " . $course_id);
+            error_log("student id= " . $id);
+
+            Course_Student::updateOrCreate([
+                'course_id' => $course_id,
+                'student_id' => $id
+            ]);
+        }
+
     }
 
     public function getContentBasedOnType(Request $request, $slug, $row)
@@ -411,6 +420,14 @@ class CourseBreadController extends Controller
     public function getSupervisorNameById($id)
     {
         return 'asdasd';
+    }
+
+    public function getSNByRegion($region_id)
+    {
+        error_log("reg id= " . $region_id);
+        return Course::where('region_id', '=', $region_id)
+            ->where('year', '=', date('Y'))
+            ->max('sn') + 1;
     }
 }
 

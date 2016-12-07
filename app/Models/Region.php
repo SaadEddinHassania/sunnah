@@ -18,6 +18,6 @@ class Region extends Model
 
     public static function toDropDown()
     {
-        return Venue::pluck('name','id');
+        return Region::pluck('name','id');
     }
 }

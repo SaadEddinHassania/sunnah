@@ -11,7 +11,7 @@ class Teacher extends Model
     public static function getName($id)
     {
         return Teacher::join('users', 'supervisors.user_id', 'users.id')
-            ->where('supervisors.type', '=', 'teacher')
+            ->where('supervisors.role_id', '=', '3')
             ->where('users.id', '=', $id)
             ->select('users.name')
             ->first()
@@ -21,7 +21,7 @@ class Teacher extends Model
     public static function toDropDown()
     {
         return Supervisor::join('users', 'supervisors.user_id', 'users.id')
-            ->where('supervisors.type', '=', 'teacher')
+            ->where('supervisors.role_id', '=', '3')
             ->pluck('users.name', 'users.id');
     }
 }
