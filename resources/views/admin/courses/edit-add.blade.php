@@ -2,9 +2,9 @@
 
 @section('css')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="/css/select2.css" rel="stylesheet">
+    {{--<link href="/css/select2.css" rel="stylesheet">--}}
     <link href="/css/select2-bootstrap.css" rel="stylesheet">
-    <script type="text/javascript" src="/js/select2.js"></script>
+    {{--<script type="text/javascript" src="/js/select2.js"></script>--}}
 @stop
 
 @section('page_header')
@@ -187,7 +187,7 @@
                                                 <?php $students = json_decode($options_)->students;?>
                                                 @foreach($students as $s)
                                                     <?php error_log($s->name);?>
-                                                    <li class='list-group-item'>
+                                                    <li class='list-group-item' id='std_{{$s->user_id}}'>
                                                         <input type='hidden' name='students_ids[]'
                                                                value='{{$s->user_id}}'/>
                                                         <div class='row'>
@@ -197,9 +197,18 @@
                                                             <div class='col-xs-4 group-student'>
                                                                 <select class='form-control'
                                                                         name='students_grade[{{$s->user_id}}][]'>
-                                                                    <option value='1' @if($s->status == 1)selected="selected"@endif>aaa</option>
-                                                                    <option value='2' @if($s->status == 2)selected="selected"@endif>bbb</option>
-                                                                    <option value='3' @if($s->status == 3)selected="selected"@endif>ccc</option>
+                                                                    <option value='1'
+                                                                            @if($s->status == 1)selected="selected"@endif>
+                                                                        aaa
+                                                                    </option>
+                                                                    <option value='2'
+                                                                            @if($s->status == 2)selected="selected"@endif>
+                                                                        bbb
+                                                                    </option>
+                                                                    <option value='3'
+                                                                            @if($s->status == 3)selected="selected"@endif>
+                                                                        ccc
+                                                                    </option>
                                                                 </select>
                                                             </div>
                                                             <div class='col-xs-4 group-student'>
@@ -293,24 +302,32 @@
         });
 
         add_student.on("change", function (e) {
+            if ($('#std_' + add_student.val()).length || add_student.val() == -1) {
+                toastr.warning('Student added !!')
+                add_student.val(-1);
+                return
+            }
             $('#students').append(
-                    "<li class='list-group-item'> " +
+                    "<li class='list-group-item' id='std_" + add_student.val() + "'> " +
                     "<input type='hidden' name='students_ids[]' value='" + add_student.val() + "'/>" +
                     "<div class='row'>" +
                     "<div class='col-xs-4 group-student'>" +
                     "<label class='form-control'>" + add_student.text() + "</label></div>" +
                     "<div class='col-xs-4 group-student'>" +
-                    "<select class='form-control' name='students_grade[" + add_student.val() + "][]'>" +
-                    "<option value='1'>asd</option>" +
+                    "<select class='form-control students_grade" + add_student.val() + "' name='students_grade[" + add_student.val() + "][]'>" +
+                    "<option value='1'>aaa</option>" +
+                    "<option value='2'>bbb</option>" +
+                    "<option value='3'>ccc</option>" +
                     "</select></div>" +
                     "<div class='col-xs-4 group-student'>" +
                     "<input class='form-control' type='number' name='students_grade[" + add_student.val() + "][]' placeholder='grade'/>" +
                     "</div></div></li>");
+            setDropDown($('.students_grade' + add_student.val()));
             add_student.val(-1);
         });
 
-        function setDropDown() {
-            add_student.select2({
+        function setDropDown(select_) {
+            select_.select2({
                 theme: "bootstrap",
                 placeholder: {
                     id: "-1",
@@ -343,7 +360,7 @@
                             text: key
                         }));
                     });
-                    setDropDown();
+                    setDropDown(add_student);
                 });
 
                 $.get("/admin/coursesRY/" + select.val(), function (data) {
@@ -363,7 +380,7 @@
                         text: key
                     }));
                 });
-                setDropDown();
+                setDropDown(add_student);
             });
         }
     </script>
