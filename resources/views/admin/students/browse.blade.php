@@ -1,14 +1,14 @@
 @extends('voyager::master')
 
 @section('page_header')
-    @can('create', \App\Models\Course::class)
     <h1 class="page-title">
         <i class="{{ $dataType->icon }}"></i> {{ $dataType->display_name_plural }}
+        @can('create', \App\Models\Student::class)
         <a href="{{ route($dataType->slug.'.create') }}" class="btn btn-success">
             <i class="voyager-plus"></i> Add New
         </a>
+        @endcan
     </h1>
-    @endcan
 @stop
 
 @section('page_header_actions')
@@ -24,6 +24,7 @@
                         <table id="dataTable" class="table table-hover">
                             <thead>
                             <tr>
+                                <?php error_log('browse: '.$dataType->browseRows);?>
                                 @foreach($dataType->browseRows as $rows)
                                     <th>{{ $rows->display_name }}</th>
                                 @endforeach
@@ -41,11 +42,7 @@
                                             @elseif($row->type == 'select_dropdown')
                                                 {{ getNameById($row->field, $data->{$row->field}) }}
                                             @else
-                                                @if($row->field == 'sn')
-                                                    {{$data->{'year'}.'-'.$data->{$row->field} }}
-                                                @else
-                                                    {{ $data->{$row->field} }}
-                                                @endif
+                                                {{ $data->{$row->field} }}
                                             @endif
                                         </td>
                                     @endforeach
@@ -62,10 +59,12 @@
                                             <i class="voyager-edit"></i> Edit
                                         </a>
                                         @endcan
+                                        @can('view', $data)
                                         <a href="{{ route($dataType->slug.'.show', $data->id) }}"
                                            class="btn-sm btn-warning pull-right">
                                             <i class="voyager-eye"></i> View
                                         </a>
+                                        @endcan
                                     </td>
                                 </tr>
                             @endforeach

@@ -8,6 +8,8 @@ class Supervisor extends Model
 {
     protected $table = 'supervisors';
 
+    public $timestamps = false;
+
     public static function getName($id)
     {
         return Supervisor::join('users', 'supervisors.user_id', 'users.id')

@@ -35,33 +35,32 @@
                                 <tr>
                                     @foreach($dataType->browseRows as $row)
                                         <td>
-                                            @if($row->type == 'image')
-                                                <img src="@if( strpos($data->{$row->field}, 'http://') === false && strpos($data->{$row->field}, 'https://') === false){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif"
-                                                     style="width:100px">
-                                            @elseif($row->type == 'select_dropdown')
+                                            @if($row->type == 'PRI')
                                                 {{ getNameById($row->field, $data->{$row->field}) }}
-                                            @else
-                                                @if($row->field == 'sn')
-                                                    {{$data->{'year'}.'-'.$data->{$row->field} }}
+                                            @elseif($row->type == 'checkbox')
+                                                @if($data->{$row->field} == 1)
+                                                    <i class="voyager-check"></i>
                                                 @else
-                                                    {{ $data->{$row->field} }}
+                                                    <i class="voyager-x"></i>
                                                 @endif
+                                            @else
+                                                {{ $data->{$row->field} }}
                                             @endif
                                         </td>
                                     @endforeach
                                     <td class="no-sort no-click">
-                                        @can('delete', $data)
+                                        {{--@can('delete', $data)--}}
                                         <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
                                              id="delete-{{ $data->id }}">
                                             <i class="voyager-trash"></i> Delete
                                         </div>
-                                        @endcan
-                                        @can('update', $data)
+                                        {{--@endcan--}}
+                                        {{--@can('update', $data)--}}
                                         <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
                                            class="btn-sm btn-primary pull-right edit">
                                             <i class="voyager-edit"></i> Edit
                                         </a>
-                                        @endcan
+                                        {{--@endcan--}}
                                         <a href="{{ route($dataType->slug.'.show', $data->id) }}"
                                            class="btn-sm btn-warning pull-right">
                                             <i class="voyager-eye"></i> View

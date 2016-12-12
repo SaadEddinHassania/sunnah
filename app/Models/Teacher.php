@@ -21,7 +21,7 @@ class Teacher extends Model
     public static function toDropDown()
     {
         return Supervisor::join('users', 'supervisors.user_id', 'users.id')
-            ->where('supervisors.role_id', '=', '3')
+//            ->where('supervisors.role_id', '=', '3')
             ->pluck('users.name', 'users.id');
     }
 }

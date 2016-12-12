@@ -3,17 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
-use App\Models\Qualification;
+use App\Models\Course_Field;
+use App\Models\Course_Student;
+use App\Models\Course_Type;
+use App\Models\Permission;
 use App\Models\Region;
-use App\Models\Specialization;
+use App\Models\Role;
+use App\Models\Role_Permission;
 use App\Models\Student;
 use App\Models\Supervisor;
-use App\User;
+use App\Models\Teacher;
+use App\Models\Venue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\Constraint;
+use Intervention\Image\Facades\Image;
 use TCG\Voyager\Models\DataType;
+use TCG\Voyager\Models\User;
 
-class StudentBreadController extends Controller
+class RolePermissionBreadController extends Controller
 {
     //***************************************
     //               ____
@@ -36,25 +46,11 @@ class StudentBreadController extends Controller
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         // Next Get the actual content from the MODEL that corresponds to the slug DataType
-        if (Auth::user()->can('view_global', Student::class)) {
-            $dataTypeContent = Student::join('users', 'users.id', 'user_id')
-//                ->where('users.is_deleted', '=', 0)
-                ->select('users.name', 'users.email', 'students.*')
-                ->get();
-        } elseif (Auth::user()->can('view_local', Student::class)) {
-            $dataTypeContent = Student::where('region_id', '=', User::getRegion())
-                ->join('users', 'users.id', 'user_id')
-                ->where('users.is_deleted', '=', 0)
-                ->select('users.name', 'users.email', 'students.*')
-                ->get();
+        if (User::isAdmin()) {
+            $dataTypeContent = Role_Permission::all();
         } else {
-            return redirect('admin')
-                ->with([
-                    'message' => "sorry, You don't have permission",
-                    'alert-type' => 'error',
-                ]);
+            return redirect('admin');
         }
-
         $view = 'voyager::bread.browse';
 
         if (view()->exists("admin.$slug.browse")) {
@@ -89,11 +85,7 @@ class StudentBreadController extends Controller
 
         $this->authorize('view', $dataTypeContent);
 
-        $dataTypeContent = $dataTypeContent->join('users', 'users.id', 'user_id')
-            ->select('users.name', 'users.email', 'students.*')
-            ->first();
-
-        return view('admin.courses.read', compact('dataType', 'dataTypeContent'));
+        return view('admin.' . $slug . '.read', compact('dataType', 'dataTypeContent'));
     }
 
     //***************************************
@@ -116,17 +108,11 @@ class StudentBreadController extends Controller
             ? call_user_func([$dataType->model_name, 'find'], $id)
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
 
-        $this->authorize('update', $dataTypeContent);
-
-        $dataTypeContent = $dataTypeContent->join('users', 'users.id', $slug . '.user_id')
-            ->where('users.id', '=', $dataTypeContent->user_id)
-            ->select('users.name', 'users.email', 'users.password', 'students.*')
-            ->first();
+        $this->authorize('edit', $dataTypeContent);
 
         $options_ = array(
-            'specialization' => Specialization::toDropDown(),
-            'qualification' => Qualification::toDropDown(),
-            'region' => [getNameById('region', $dataTypeContent->region_id)]
+            'role' => Role::toDropDown(),
+            'permission' => Permission::toDropDown()
         );
         $options_ = json_encode($options_);
 
@@ -178,21 +164,14 @@ class StudentBreadController extends Controller
     public function create(Request $request)
     {
 
-        $this->authorize('create', Student::class);
+//        $this->authorize('create', Course::class);
 
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
-        if (User::isAdmin() || Auth::user()->can('create_global', Student::class)) {
-            $region = Region::toDropDown();
-        } else {
-            $region = [getNameById('region', \App\User::getRegion())];
-        }
-
         $options_ = array(
-            'specialization' => Specialization::toDropDown(),
-            'qualification' => Qualification::toDropDown(),
-            'region' => $region
+            'role' => Role::toDropDown(),
+            'permission' => Permission::toDropDown()
         );
         $options_ = json_encode($options_);
 
@@ -213,6 +192,11 @@ class StudentBreadController extends Controller
     {
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
+
+        if (function_exists('voyager_add_post')) {
+            $url = $request->url();
+            voyager_add_post($request);
+        }
 
         $data = new $dataType->model_name();
 
@@ -246,8 +230,6 @@ class StudentBreadController extends Controller
 
         $data = call_user_func([$dataType->model_name, 'find'], $id);
 
-        $user_id = $data->user_id;
-
         $this->authorize('delete', $data);
 
         foreach ($dataType->deleteRows as $row) {
@@ -271,14 +253,15 @@ class StudentBreadController extends Controller
             }
         }
 
-        $data =
-            [
+        $data = $data->destroy($id)
+            ? [
                 'message' => "Successfully Deleted {$dataType->display_name_singular}",
                 'alert-type' => 'success',
+            ]
+            : [
+                'message' => "Sorry it appears there was a problem deleting this {$dataType->display_name_singular}",
+                'alert-type' => 'error',
             ];
-
-        User::where('id', '=', $user_id)
-            ->update(['is_deleted' => 1]);
 
         return redirect()->route("{$dataType->slug}.index")->with($data);
 
@@ -287,60 +270,30 @@ class StudentBreadController extends Controller
     public function insertUpdateData($request, $slug, $rows, $data)
     {
         $rules = [];
-        if (isset($data->user_id)) {
-            $user_data = User::find($data->user_id);
-            $region_id = $data->region_id;
-        } else {
-            $user_data = User::where('email', '=', $request->input('email'))
-                ->where('is_deleted', '=', 1)
-                ->first();
-            if ($user_data === null)
-                $user_data = new User;
-
-            if (Auth::user()->can('create_global', Student::class)) {
-                $region_id = $request->input('region_id');
-            } else {
-                $region_id = User::getRegion();
-            }
-        }
 
         foreach ($rows as $row) {
-
-            error_log($row->field);
-            if (!array_key_exists($row->field, ['name' => '', 'email' => '', 'password' => ''])) {
-                $content = $this->getContentBasedOnType($request, $slug, $row);
-                if ($content === null) {
-                    if (isset($data->{$row->field})) {
-                        $content = $data->{$row->field};
-                    }
-                    if ($row->field == 'password') {
-                        $content = $data->{$row->field};
-                    }
-                }
-
-                $data->{$row->field} = $content;
-            } else {
-                $content = $this->getContentBasedOnType($request, 'users', $row);
-                if ($content === null) {
-                    if (isset($data->{$row->field})) {
-                        $content = $user_data->{$row->field};
-                    }
-                    if ($row->field == 'password') {
-                        $content = $user_data->{$row->field};
-                    }
-                }
-
-                $user_data->{$row->field} = $content;
+            $options = json_decode($row->details);
+            if (isset($options->rule)) {
+                $rules[$row->field] = $options->rule;
             }
+
+            $content = $this->getContentBasedOnType($request, $slug, $row);
+            if ($content === null) {
+                if (isset($data->{$row->field})) {
+                    $content = $data->{$row->field};
+                }
+                if ($row->field == 'password') {
+                    $content = $data->{$row->field};
+                }
+            }
+
+            $data->{$row->field} = $content;
         }
+
+//        $this->authorize('insertUpdateData', $data);
 
         $this->validate($request, $rules);
 
-        $user_data->is_deleted = 0;
-        $user_data->save();
-
-        $data->user_id = $user_data->id;
-        $data->region_id = $region_id;
         $data->save();
 
     }
@@ -467,10 +420,12 @@ class StudentBreadController extends Controller
         }
     }
 
-    public function getStudentByRegion($region_id)
+    public function getSNByRegion($region_id)
     {
-        return Student::join('users', 'students.user_id', 'users.id')
-            ->where('region_id', '=', $region_id)
-            ->pluck('students.user_id', 'users.name');
+        error_log("reg id= " . $region_id);
+        return Course::where('region_id', '=', $region_id)
+            ->where('year', '=', date('Y'))
+            ->max('sn') + 1;
     }
 }
+

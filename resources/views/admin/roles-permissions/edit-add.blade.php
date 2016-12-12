@@ -47,6 +47,13 @@
                                         @else
                                             <label for="name">{{ $row->display_name }}</label>
                                         @endif
+
+                                        <?php
+                                        if ($row->type == 'PRI') {
+                                            $row->type = 'select_dropdown';
+                                        }
+                                        ?>
+
                                         @if($row->type == "text")
                                             <input type="text" class="form-control" name="{{ $row->field }}"
                                                    placeholder="{{ $row->display_name }}"
@@ -154,81 +161,7 @@
 
                             </div><!-- panel-body -->
                         </div>
-                        <div class="col-md-5">
-                            <div class="panel panel panel-bordered panel-info">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title"><i class="icon wb-clipboard"></i> Add Students</h3>
-                                    <div class="panel-actions">
-                                        <a class="panel-action icon wb-minus" data-toggle="panel-collapse"
-                                           aria-hidden="true"></a>
-                                    </div>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="form-group">
-                                        <select name="add_student" id="add_student" class="form-control">
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <table class="table table-hover">
-                                            <thead>
-                                            <tr>
-                                                <th class="text-center">Name</th>
-                                                <th class="text-center">Status</th>
-                                                <th class="text-center">Grade</th>
-                                            </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                    <div class="form-group">
-                                        <ul name='students' id="students" class="from-control list-group">
-                                            @if(isset($dataTypeContent->id))
-                                                <?php $students = json_decode($options_)->students;?>
-                                                @foreach($students as $s)
-                                                    <?php error_log($s->name);?>
-                                                    <li class='list-group-item' id='std_{{$s->user_id}}'>
-                                                        <input type='hidden' name='students_ids[]'
-                                                               value='{{$s->user_id}}'/>
-                                                        <div class='row'>
-                                                            <div class='col-xs-4 group-student'>
-                                                                <label class='form-control'>{{$s->name}}</label>
-                                                            </div>
-                                                            <div class='col-xs-4 group-student'>
-                                                                <select class='form-control'
-                                                                        name='students_grade[{{$s->user_id}}][]'>
-                                                                    <option value='1'
-                                                                            @if($s->status == 1)selected="selected"@endif>
-                                                                        aaa
-                                                                    </option>
-                                                                    <option value='2'
-                                                                            @if($s->status == 2)selected="selected"@endif>
-                                                                        bbb
-                                                                    </option>
-                                                                    <option value='3'
-                                                                            @if($s->status == 3)selected="selected"@endif>
-                                                                        ccc
-                                                                    </option>
-                                                                </select>
-                                                            </div>
-                                                            <div class='col-xs-4 group-student'>
-                                                                <input class='form-control' type='number'
-                                                                       name='students_grade[{{$s->user_id}}][]'
-                                                                       value="{{$s->grade}}"
-                                                                       placeholder='grade'/>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    {{--<li class='list-group-item'>--}}
-                                                    {{--<input type='hidden' name='students_ids[]' value='{{$key}}'/>--}}
-                                                    {{--{{$value}}--}}
-                                                    {{--</li>--}}
-                                                @endforeach
-                                            @endif
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
 
-                        </div>
                     </div>
 
                     <!-- PUT Method if we are editing -->

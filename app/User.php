@@ -2,10 +2,13 @@
 
 namespace App;
 
+use App\Models\Student;
 use App\Models\Supervisor;
+use App\Models\User_Role;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
@@ -23,7 +26,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
-    
+
     public function getNameAttribute($value)
     {
         return ucwords($value);
@@ -39,13 +42,14 @@ class User extends Authenticatable
         $this->attributes['created_at'] = Carbon::parse($value)->format('Y-m-d H:i:s');
     }
 
-    public function supervisor(){
+    public function supervisor()
+    {
         return $this->hasOne(Supervisor::class);
     }
 
-    public function is_admin() {
-        if (count($this->supervisor))
-        {
+    public function is_admin()
+    {
+        if (count($this->supervisor)) {
             return true;
         }
         return false;
@@ -53,8 +57,7 @@ class User extends Authenticatable
 
     public function permissions()
     {
-        if (count($this->supervisor))
-        {
+        if (count($this->supervisor)) {
             return $this->supervisor()->role->permissions();
         }
         return null;
@@ -88,5 +91,29 @@ class User extends Authenticatable
             $this->supervisor()->role_id = null;
             $this->supervisor()->save();
         }
+    }
+
+    public static function isAdmin()
+    {
+        $stc = Student::where('user_id', '=', Auth::user()->id)->count();
+        $spc = Supervisor::where('user_id', '=', Auth::user()->id)->count();
+        if ($stc == 0 && $spc == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function getRegion()
+    {
+        return Supervisor::where('user_id', '=', Auth::user()->id)->first()->region_id;
+    }
+
+    public static function geyRoleId($id)
+    {
+        return User::join('supervisors', 'users.id', 'supervisors.user_id')
+            ->where('supervisors.user_id', '=', $id)
+            ->select('role_id')
+            ->first()
+            ->role_id;
     }
 }

@@ -11,13 +11,14 @@ use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\Teacher;
 use App\Models\Venue;
-use Illuminate\Contracts\Logging\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Constraint;
 use Intervention\Image\Facades\Image;
 use TCG\Voyager\Models\DataType;
+use TCG\Voyager\Models\User;
 
 class CourseBreadController extends Controller
 {
@@ -42,10 +43,13 @@ class CourseBreadController extends Controller
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         // Next Get the actual content from the MODEL that corresponds to the slug DataType
-        $dataTypeContent = (strlen($dataType->model_name) != 0)
-            ? call_user_func([$dataType->model_name, 'all'])
-            : DB::table($dataType->name)->get(); // If Model doest exist, get data from table name
-
+        if (User::isAdmin()) {
+            $dataTypeContent = Course::all();
+        } else {
+            $dataTypeContent = Course::where('region_id', '=',
+                Supervisor::where('user_id', '=', Auth::user()->id)
+                    ->select('region_id')->first()->region_id)->get();
+        }
         $view = 'voyager::bread.browse';
 
         if (view()->exists("admin.$slug.browse")) {
@@ -78,6 +82,8 @@ class CourseBreadController extends Controller
             ? call_user_func([$dataType->model_name, 'find'], $id)
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
 
+        $this->authorize('view', $dataTypeContent);
+
         return view('admin.courses.read', compact('dataType', 'dataTypeContent'));
     }
 
@@ -101,6 +107,8 @@ class CourseBreadController extends Controller
             ? call_user_func([$dataType->model_name, 'find'], $id)
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
 
+        $this->authorize('edit', $dataTypeContent);
+
         $options_ = array(
             'supervisor' => Supervisor::toDropDown(),
             'teacher' => Teacher::toDropDown(),
@@ -121,6 +129,8 @@ class CourseBreadController extends Controller
         }
 
         return view($view, compact('dataType', 'dataTypeContent', 'options_'));
+
+
     }
 
     // POST BR(E)AD
@@ -129,7 +139,9 @@ class CourseBreadController extends Controller
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
         $data = call_user_func([$dataType->model_name, 'find'], $id);
-        error_log(json_encode($request->input()));
+
+        $this->authorize('update', $data);
+
         $this->insertUpdateData($request, $slug, $dataType->editRows, $data);
 
         return redirect()
@@ -155,6 +167,9 @@ class CourseBreadController extends Controller
 
     public function create(Request $request)
     {
+
+        $this->authorize('create', Course::class);
+
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
@@ -177,9 +192,10 @@ class CourseBreadController extends Controller
         }
 
         return view($view, compact('dataType', 'options_'));
+
     }
 
-    // POST BRE(A)D
+// POST BRE(A)D
     public function store(Request $request)
     {
         $slug = $request->segment(2);
@@ -202,24 +218,27 @@ class CourseBreadController extends Controller
             ]);
     }
 
-    //***************************************
-    //                _____
-    //               |  __ \
-    //               | |  | |
-    //               | |  | |
-    //               | |__| |
-    //               |_____/
-    //
-    //         Delete an item BREA(D)
-    //
-    //****************************************
+//***************************************
+//                _____
+//               |  __ \
+//               | |  | |
+//               | |  | |
+//               | |__| |
+//               |_____/
+//
+//         Delete an item BREA(D)
+//
+//****************************************
 
     public function destroy(Request $request, $id)
     {
+
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         $data = call_user_func([$dataType->model_name, 'find'], $id);
+
+        $this->authorize('delete', $data);
 
         foreach ($dataType->deleteRows as $row) {
             if ($row->type == 'image') {
@@ -253,6 +272,7 @@ class CourseBreadController extends Controller
             ];
 
         return redirect()->route("{$dataType->slug}.index")->with($data);
+
     }
 
     public function insertUpdateData($request, $slug, $rows, $data)
@@ -277,6 +297,8 @@ class CourseBreadController extends Controller
 
             $data->{$row->field} = $content;
         }
+
+        $this->authorize('insertUpdateData', $data);
 
         $this->validate($request, $rules);
 
@@ -419,11 +441,6 @@ class CourseBreadController extends Controller
         if (Storage::exists($path)) {
             Storage::delete($path);
         }
-    }
-
-    public function getSupervisorNameById($id)
-    {
-        return 'asdasd';
     }
 
     public function getSNByRegion($region_id)

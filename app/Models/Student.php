@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
     protected $table = 'students';
+    
+    public $timestamps = false;
 
     public static function getName($id)
     {
