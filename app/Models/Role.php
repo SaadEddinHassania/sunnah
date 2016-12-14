@@ -14,13 +14,13 @@ class Role extends Model
     public static function getName($id)
     {
         return Role::where('id', '=', $id)
-            ->select('name')
+            ->select('display_name')
             ->first()
             ->name;
     }
 
     public static function toDropDown()
     {
-        return Role::pluck('name', 'id');
+        return Role::pluck('display_name', 'id');
     }
 }

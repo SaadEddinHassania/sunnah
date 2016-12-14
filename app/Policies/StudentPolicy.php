@@ -60,7 +60,7 @@ class StudentPolicy
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->select('global')
             ->first();
-        
+
         if ($global === null) {
             return false;
         } elseif ($global) {

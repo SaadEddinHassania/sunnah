@@ -3,28 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Qualification;
+use App\Models\Region;
 use App\Models\Role;
 use App\Models\Specialization;
 use App\Models\Supervisor;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use TCG\Voyager\Models\DataType;
 
 class SupervisorBreadController extends Controller
 {
 
     public $role_id;
-//***************************************
-//               ____
-//              |  _ \
-//              | |_) |
-//              |  _ <
-//              | |_) |
-//              |____/
-//
-//      Browse our Data Type (B)READ
-//
-//****************************************
+    //***************************************
+    //               ____
+    //              |  _ \
+    //              | |_) |
+    //              |  _ <
+    //              | |_) |
+    //              |____/
+    //
+    //      Browse our Data Type (B)READ
+    //
+    //****************************************
 
     public function index(Request $request)
     {
@@ -42,25 +44,50 @@ class SupervisorBreadController extends Controller
             $dataType->display_name_plural = 'Teachers';
             $dataType->display_name_singular = 'Teacher';
             $dataType->slug = 'teachers';
-        }
 
-        // Next Get the actual content from the MODEL that corresponds to the slug DataType
-        if (User::isAdmin()) {
-            $dataTypeContent = Supervisor::where('role_id', '=', $this->role_id)
-                ->join('users', 'users.id', 'user_id')
-                ->where('users.is_deleted', '=', 0)
-                ->select('users.name', 'users.email', 'supervisors.*')
-                ->get();;
+            if (Auth::user()->can('view_teacher_global', Supervisor::class)) {
+                $dataTypeContent = Supervisor::join('users', 'users.id', 'user_id')
+//                ->where('users.is_deleted', '=', 0)
+                    ->where('role_id', '=', $this->role_id)
+                    ->select('users.name', 'users.email', 'supervisors.*')
+                    ->get();
+            } elseif (Auth::user()->can('view_teacher_local', Supervisor::class)) {
+                $dataTypeContent = Supervisor::where('region_id', '=', User::getRegion())
+                    ->join('users', 'users.id', 'user_id')
+                    ->where('role_id', '=', $this->role_id)
+                    ->where('users.is_deleted', '=', 0)
+                    ->select('users.name', 'users.email', 'supervisors.*')
+                    ->get();
+            } else {
+                return redirect('admin')
+                    ->with([
+                        'message' => "sorry, You don't have permission",
+                        'alert-type' => 'error',
+                    ]);
+            }
         } else {
-            $dataTypeContent = Supervisor::where('region_id', '=', User::getRegion())
-                ->where('role_id', '=', $this->role_id)
-                ->join('users', 'users.id', 'user_id')
-                ->where('users.is_deleted', '=', 0)
-                ->select('users.name', 'users.email', 'supervisors.*')
-                ->get();
+            // Next Get the actual content from the MODEL that corresponds to the slug DataType
+            if (Auth::user()->can('view_global', Supervisor::class)) {
+                $dataTypeContent = Supervisor::join('users', 'users.id', 'user_id')
+//                ->where('users.is_deleted', '=', 0)
+                    ->where('role_id', '!=', 3)
+                    ->select('users.name', 'users.email', 'supervisors.*')
+                    ->get();
+            } elseif (Auth::user()->can('view_local', Supervisor::class)) {
+                $dataTypeContent = Supervisor::where('region_id', '=', User::getRegion())
+                    ->join('users', 'users.id', 'user_id')
+                    ->where('role_id', '!=', 3)
+                    ->where('users.is_deleted', '=', 0)
+                    ->select('users.name', 'users.email', 'supervisors.*')
+                    ->get();
+            } else {
+                return redirect('admin')
+                    ->with([
+                        'message' => "sorry, You don't have permission",
+                        'alert-type' => 'error',
+                    ]);
+            }
         }
-
-        error_log($dataTypeContent);
 
         $view = 'voyager::bread.browse';
 
@@ -73,17 +100,17 @@ class SupervisorBreadController extends Controller
         return view($view, compact('dataType', 'dataTypeContent'));
     }
 
-//***************************************
-//                _____
-//               |  __ \
-//               | |__) |
-//               |  _  /
-//               | | \ \
-//               |_|  \_\
-//
-//  Read an item of our Data Type B(R)EAD
-//
-//****************************************
+    //***************************************
+    //                _____
+    //               |  __ \
+    //               | |__) |
+    //               |  _  /
+    //               | | \ \
+    //               |_|  \_\
+    //
+    //  Read an item of our Data Type B(R)EAD
+    //
+    //****************************************
 
     public function show(Request $request, $id)
     {
@@ -106,8 +133,11 @@ class SupervisorBreadController extends Controller
             ? call_user_func([$dataType->model_name, 'find'], $id)
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
 
-        error_log('supervisor' . $dataTypeContent);
-        $this->authorize('view', $dataTypeContent);
+        if ($request->segment(2) == 'teachers') {
+            $this->authorize('view_teacher', $dataTypeContent);
+        } else {
+            $this->authorize('view', $dataTypeContent);
+        }
 
         $dataTypeContent = $dataTypeContent->join('users', 'users.id', 'user_id')
             ->select('users.name', 'users.email', 'supervisors.*')
@@ -117,17 +147,17 @@ class SupervisorBreadController extends Controller
         return view('admin.courses.read', compact('dataType', 'dataTypeContent'));
     }
 
-//***************************************
-//                ______
-//               |  ____|
-//               | |__
-//               |  __|
-//               | |____
-//               |______|
-//
-//  Edit an item of our Data Type BR(E)AD
-//
-//****************************************
+    //***************************************
+    //                ______
+    //               |  ____|
+    //               | |__
+    //               |  __|
+    //               | |____
+    //               |______|
+    //
+    //  Edit an item of our Data Type BR(E)AD
+    //
+    //****************************************
 
     public function edit(Request $request, $id)
     {
@@ -147,19 +177,26 @@ class SupervisorBreadController extends Controller
             $dataType->display_name_plural = 'Teachers';
             $dataType->display_name_singular = 'Teacher';
             $dataType->slug = 'teachers';
+            $this->authorize('update_teacher', $dataTypeContent);
+        } else {
+            $this->authorize('update', $dataTypeContent);
         }
-
-        $this->authorize('edit', $dataTypeContent);
 
         $dataTypeContent = $dataTypeContent->join('users', 'users.id', $slug . '.user_id')
             ->where('users.id', '=', $dataTypeContent->user_id)
             ->select('users.name', 'users.email', 'users.password', $slug . '.*')
             ->first();
 
+        if (Auth::user()->can('update_role', Supervisor::class)) {
+            $role = Role::toDropDown();
+        } else {
+            $role = [getNameById('role', $dataTypeContent->role_id)];
+        }
+
         $options_ = array(
             'specialization' => Specialization::toDropDown(),
             'qualification' => Qualification::toDropDown(),
-            'role' => Role::toDropDown(),
+            'role' => $role,
             'region' => [getNameById('region', $dataTypeContent->region_id)]
         );
         $options_ = json_encode($options_);
@@ -196,8 +233,11 @@ class SupervisorBreadController extends Controller
             $dataType->slug = 'teachers';
         }
 
-        $this->authorize('update', $data);
-
+        if ($request->segment(2) == 'teachers') {
+            $this->authorize('update_teacher', $data);
+        } else {
+            $this->authorize('update', $data);
+        }
         $this->insertUpdateData($request, $slug, $dataType->editRows, $data);
 
         return redirect()
@@ -224,13 +264,14 @@ class SupervisorBreadController extends Controller
     public function create(Request $request)
     {
 
-        $this->authorize('create', Supervisor::class);
-
         $slug = $request->segment(2);
 
         if ($slug == 'teachers') {
             $this->role_id = 3;
             $slug = 'supervisors';
+            $this->authorize('create_teacher', Supervisor::class);
+        } else {
+            $this->authorize('create', Supervisor::class);
         }
 
         $dataType = DataType::where('slug', '=', $slug)->first();
@@ -242,9 +283,17 @@ class SupervisorBreadController extends Controller
             $dataType->slug = 'teachers';
         }
 
+        if (User::isAdmin() || Auth::user()->can('create_teacher_global', Supervisor::class)) {
+            $region = Region::toDropDown();
+        } else {
+            $region = [getNameById('region', \App\User::getRegion())];
+        }
+
         $options_ = array(
             'specialization' => Specialization::toDropDown(),
             'qualification' => Qualification::toDropDown(),
+            'region' => $region,
+            'role' => ['Teacher']
         );
         $options_ = json_encode($options_);
 
@@ -365,12 +414,32 @@ class SupervisorBreadController extends Controller
         error_log('Data= ' . $data);
         if (isset($data->user_id)) {
             $user_data = User::find($data->user_id);
+            $region_id = $data->region_id;
+            $role_id = $request->input('role_id');
         } else {
             $user_data = User::where('email', '=', $request->input('email'))
                 ->where('is_deleted', '=', 1)
                 ->first();
             if (!isset($user_data->id))
                 $user_data = new User;
+
+            if ($request->segment(2) == 'teachers') {
+                $role_id = 3;
+
+                if (Auth::user()->can('create_teacher_global', Supervisor::class)) {
+                    $region_id = $request->input('region_id');
+                } else {
+                    $region_id = User::getRegion();
+                }
+            } else {
+                $role_id = $request->input('role_id');
+
+                if (Auth::user()->can('create_global', Supervisor::class)) {
+                    $region_id = $request->input('region_id');
+                } else {
+                    $region_id = User::getRegion();
+                }
+            }
         }
 
         foreach ($rows as $row) {
@@ -407,19 +476,14 @@ class SupervisorBreadController extends Controller
             }
         }
 
-        error_log('Data:=' . $data);
-        error_log('User:=' . $user_data);
-
-        $this->authorize('insertUpdateData', $data);
-
         $this->validate($request, $rules);
 
         $user_data->is_deleted = 0;
         $user_data->save();
 
         $data->user_id = $user_data->id;
-        $data->region_id = \App\User::getRegion();
-        $data->role_id = $this->role_id;
+        $data->region_id = $region_id;
+        $data->role_id = $role_id;
         $data->save();
 
     }

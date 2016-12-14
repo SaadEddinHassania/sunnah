@@ -3,9 +3,19 @@
 @section('page_header')
     <h1 class="page-title">
         <i class="{{ $dataType->icon }}"></i> {{ $dataType->display_name_plural }}
-        <a href="{{ route($dataType->slug.'.create') }}" class="btn btn-success">
-            <i class="voyager-plus"></i> Add New
-        </a>
+        @if($dataType->slug == 'teachers')
+            @can('create_teacher', \App\Models\Supervisor::class)
+            <a href="{{ route($dataType->slug.'.create') }}" class="btn btn-success">
+                <i class="voyager-plus"></i> Add New
+            </a>
+            @endcan
+        @else
+            @can('create', \App\Models\Supervisor::class)
+            <a href="{{ route($dataType->slug.'.create') }}" class="btn btn-success">
+                <i class="voyager-plus"></i> Add New
+            </a>
+            @endcan
+        @endif
     </h1>
 @stop
 
@@ -22,7 +32,7 @@
                         <table id="dataTable" class="table table-hover">
                             <thead>
                             <tr>
-                                <?php error_log('browse: '.$dataType->browseRows);?>
+                                <?php error_log('browse: ' . $dataType->browseRows);?>
                                 @foreach($dataType->browseRows as $rows)
                                     <th>{{ $rows->display_name }}</th>
                                 @endforeach
@@ -45,18 +55,45 @@
                                         </td>
                                     @endforeach
                                     <td class="no-sort no-click">
-                                        <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
-                                             id="delete-{{ $data->id }}">
-                                            <i class="voyager-trash"></i> Delete
-                                        </div>
-                                        <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
-                                           class="btn-sm btn-primary pull-right edit">
-                                            <i class="voyager-edit"></i> Edit
-                                        </a>
-                                        <a href="{{ route($dataType->slug.'.show', $data->id) }}"
-                                           class="btn-sm btn-warning pull-right">
-                                            <i class="voyager-eye"></i> View
-                                        </a>
+                                        @if($dataType->slug == 'teachers')
+                                            @can('delete_teacher', $data)
+                                            <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
+                                                 id="delete-{{ $data->id }}">
+                                                <i class="voyager-trash"></i> Delete
+                                            </div>
+                                            @endcan
+                                            @can('update_teacher', $data)
+                                            <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
+                                               class="btn-sm btn-primary pull-right edit">
+                                                <i class="voyager-edit"></i> Edit
+                                            </a>
+                                            @endcan
+                                            @can('view_teacher', $data)
+                                            <a href="{{ route($dataType->slug.'.show', $data->id) }}"
+                                               class="btn-sm btn-warning pull-right">
+                                                <i class="voyager-eye"></i> View
+                                            </a>
+                                            @endcan
+                                        @else
+                                            @can('delete', $data)
+                                            <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
+                                                 id="delete-{{ $data->id }}">
+                                                <i class="voyager-trash"></i> Delete
+                                            </div>
+                                            @endcan
+                                            @can('update', $data)
+                                            <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
+                                               class="btn-sm btn-primary pull-right edit">
+                                                <i class="voyager-edit"></i> Edit
+                                            </a>
+                                            @endcan
+                                            @can('view', $data)
+                                            <a href="{{ route($dataType->slug.'.show', $data->id) }}"
+                                               class="btn-sm btn-warning pull-right">
+                                                <i class="voyager-eye"></i> View
+                                            </a>
+                                            @endcan
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

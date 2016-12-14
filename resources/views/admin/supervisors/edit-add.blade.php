@@ -85,9 +85,24 @@
                                                 $dataTypeContent->{$row->field}) : old($row->field); ?>
                                         <select class="form-control"
                                                 name="{{ $row->field }}"
+                                                @if($dataType->slug == 'teachers')
+                                                @cannot('create_teacher_global', \App\Models\Supervisor::class)
                                                 @if(!$row->edit) disabled @endif
-                                                @if ($row->field == 'role_id' && !\App\User::isAdmin())
+                                                @endcannot
+                                                @else
+                                                @cannot('create_global', \App\Models\Supervisor::class)
+                                                @if(!$row->edit) disabled @endif
+                                                @endcannot
+                                                @endif
+                                                @if ($row->field == 'role_id')
+                                                @if(!isset($dataTypeContent->id) && $dataType->slug == 'teachers')
                                                 disabled
+                                                @elseif(!isset($dataTypeContent->id))
+                                                @elseif(isset($dataTypeContent->id))
+                                                @cannot('update_role', \App\Models\Supervisor::class)
+                                                disabled
+                                                @endcannot
+                                                @endif
                                                 @endif>
                                             <?php $default = (isset($options->default) && !isset($dataTypeContent->{$row->field})) ? $options->default : NULL; ?>
                                             @if(isset($options->$field_name))
