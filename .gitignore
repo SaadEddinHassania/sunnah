@@ -1,7 +1,7 @@
 /node_modules
 /public/storage
 /vendor/*
-!/vendor/tcg/voyager
+!/vendor/tcg/*
 /.idea
 Homestead.json
 Homestead.yaml
