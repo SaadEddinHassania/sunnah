@@ -16,7 +16,7 @@ class Role extends Model
         return Role::where('id', '=', $id)
             ->select('display_name')
             ->first()
-            ->name;
+            ->display_name;
     }
 
     public static function toDropDown()

@@ -39,6 +39,8 @@ class RolePermissionBreadController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('roles_permissions', Role_Permission::class);
+
         // GET THE SLUG, ex. 'posts', 'pages', etc.
         $slug = $request->segment(2);
 
@@ -46,11 +48,8 @@ class RolePermissionBreadController extends Controller
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         // Next Get the actual content from the MODEL that corresponds to the slug DataType
-        if (User::isAdmin()) {
-            $dataTypeContent = Role_Permission::all();
-        } else {
-            return redirect('admin');
-        }
+        $dataTypeContent = Role_Permission::all();
+
         $view = 'voyager::bread.browse';
 
         if (view()->exists("admin.$slug.browse")) {
@@ -76,14 +75,14 @@ class RolePermissionBreadController extends Controller
 
     public function show(Request $request, $id)
     {
+        $this->authorize('roles_permissions', Role_Permission::class);
+
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         $dataTypeContent = (strlen($dataType->model_name) != 0)
             ? call_user_func([$dataType->model_name, 'find'], $id)
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
-
-        $this->authorize('view', $dataTypeContent);
 
         return view('admin.' . $slug . '.read', compact('dataType', 'dataTypeContent'));
     }
@@ -102,13 +101,13 @@ class RolePermissionBreadController extends Controller
 
     public function edit(Request $request, $id)
     {
+        $this->authorize('roles_permissions', Role_Permission::class);
+
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
         $dataTypeContent = (strlen($dataType->model_name) != 0)
             ? call_user_func([$dataType->model_name, 'find'], $id)
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
-
-        $this->authorize('edit', $dataTypeContent);
 
         $options_ = array(
             'role' => Role::toDropDown(),
@@ -132,11 +131,11 @@ class RolePermissionBreadController extends Controller
     // POST BR(E)AD
     public function update(Request $request, $id)
     {
+        $this->authorize('roles_permissions', Role_Permission::class);
+
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
         $data = call_user_func([$dataType->model_name, 'find'], $id);
-
-        $this->authorize('update', $data);
 
         $this->insertUpdateData($request, $slug, $dataType->editRows, $data);
 
@@ -163,8 +162,7 @@ class RolePermissionBreadController extends Controller
 
     public function create(Request $request)
     {
-
-//        $this->authorize('create', Course::class);
+        $this->authorize('roles_permissions', Role_Permission::class);
 
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
@@ -190,6 +188,8 @@ class RolePermissionBreadController extends Controller
 // POST BRE(A)D
     public function store(Request $request)
     {
+        $this->authorize('roles_permissions', Role_Permission::class);
+
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
@@ -224,13 +224,12 @@ class RolePermissionBreadController extends Controller
 
     public function destroy(Request $request, $id)
     {
+        $this->authorize('roles_permissions', Role_Permission::class);
 
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         $data = call_user_func([$dataType->model_name, 'find'], $id);
-
-        $this->authorize('delete', $data);
 
         foreach ($dataType->deleteRows as $row) {
             if ($row->type == 'image') {
@@ -289,8 +288,6 @@ class RolePermissionBreadController extends Controller
 
             $data->{$row->field} = $content;
         }
-
-//        $this->authorize('insertUpdateData', $data);
 
         $this->validate($request, $rules);
 

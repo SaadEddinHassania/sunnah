@@ -10,6 +10,7 @@ use App\Models\Supervisor;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use TCG\Voyager\Models\DataType;
 
 class SupervisorBreadController extends Controller
@@ -70,13 +71,11 @@ class SupervisorBreadController extends Controller
             if (Auth::user()->can('view_global', Supervisor::class)) {
                 $dataTypeContent = Supervisor::join('users', 'users.id', 'user_id')
 //                ->where('users.is_deleted', '=', 0)
-                    ->where('role_id', '!=', 3)
                     ->select('users.name', 'users.email', 'supervisors.*')
                     ->get();
             } elseif (Auth::user()->can('view_local', Supervisor::class)) {
                 $dataTypeContent = Supervisor::where('region_id', '=', User::getRegion())
                     ->join('users', 'users.id', 'user_id')
-                    ->where('role_id', '!=', 3)
                     ->where('users.is_deleted', '=', 0)
                     ->select('users.name', 'users.email', 'supervisors.*')
                     ->get();
@@ -283,7 +282,7 @@ class SupervisorBreadController extends Controller
             $dataType->slug = 'teachers';
         }
 
-        if (User::isAdmin() || Auth::user()->can('create_teacher_global', Supervisor::class)) {
+        if (Auth::user()->can('create_teacher_global', Supervisor::class)) {
             $region = Region::toDropDown();
         } else {
             $region = [getNameById('region', \App\User::getRegion())];
@@ -317,6 +316,9 @@ class SupervisorBreadController extends Controller
         if ($slug == 'teachers') {
             $this->role_id = 3;
             $slug = 'supervisors';
+            $this->authorize('create_teacher', Supervisor::class);
+        } else {
+            $this->authorize('create', Supervisor::class);
         }
 
         $dataType = DataType::where('slug', '=', $slug)->first();
@@ -479,12 +481,15 @@ class SupervisorBreadController extends Controller
         $this->validate($request, $rules);
 
         $user_data->is_deleted = 0;
-        $user_data->save();
 
-        $data->user_id = $user_data->id;
-        $data->region_id = $region_id;
-        $data->role_id = $role_id;
-        $data->save();
+        DB::transaction(function () use ($data, $user_data, $region_id, $role_id) {
+            $user_data->save();
+
+            $data->user_id = $user_data->id;
+            $data->region_id = $region_id;
+            $data->role_id = $role_id;
+            $data->save();
+        });
 
     }
 

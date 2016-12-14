@@ -12,18 +12,16 @@ class QualificationsTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('qualifications')->delete();
-        
-        \DB::table('qualifications')->insert(array (
-            0 => 
-            array (
-                'id' => 1,
-                'name' => 'توجيهي'
-            ),
-        ));
-        
-        
+
+        \DB::table('qualifications')->insert(
+            array(
+                array('id' => 1, 'name' => 'توجيهي'),
+            )
+        );
+
+
     }
 }

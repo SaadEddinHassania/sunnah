@@ -11,14 +11,15 @@ use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\Teacher;
 use App\Models\Venue;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Constraint;
 use Intervention\Image\Facades\Image;
 use TCG\Voyager\Models\DataType;
-use TCG\Voyager\Models\User;
 
 class CourseBreadController extends Controller
 {
@@ -43,13 +44,18 @@ class CourseBreadController extends Controller
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         // Next Get the actual content from the MODEL that corresponds to the slug DataType
-        if (User::isAdmin()) {
+        if (Auth::user()->can('view_global', Course::class)) {
             $dataTypeContent = Course::all();
+        } elseif (Auth::user()->can('view_local', Course::class)) {
+            $dataTypeContent = Course::where('region_id', '=', User::getRegion())->get();
         } else {
-            $dataTypeContent = Course::where('region_id', '=',
-                Supervisor::where('user_id', '=', Auth::user()->id)
-                    ->select('region_id')->first()->region_id)->get();
+            return redirect('admin')
+                ->with([
+                    'message' => "sorry, You don't have permission",
+                    'alert-type' => 'error',
+                ]);
         }
+
         $view = 'voyager::bread.browse';
 
         if (view()->exists("admin.$slug.browse")) {
@@ -84,7 +90,9 @@ class CourseBreadController extends Controller
 
         $this->authorize('view', $dataTypeContent);
 
-        return view('admin.courses.read', compact('dataType', 'dataTypeContent'));
+        $students = Student::getStudentsByCourse($dataTypeContent->id);
+
+        return view('admin.courses.read', compact('dataType', 'dataTypeContent', 'students'));
     }
 
     //***************************************
@@ -107,12 +115,12 @@ class CourseBreadController extends Controller
             ? call_user_func([$dataType->model_name, 'find'], $id)
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
 
-        $this->authorize('edit', $dataTypeContent);
+        $this->authorize('update', $dataTypeContent);
 
         $options_ = array(
             'supervisor' => Supervisor::toDropDown(),
             'teacher' => Teacher::toDropDown(),
-            'region' => Region::toDropDown(),
+            'region' => [getNameById('region', $dataTypeContent->region_id)],
             'venue' => Venue::toDropDown(),
             'field' => Course_Field::toDropDown(),
             'type' => Course_Type::toDropDown(),
@@ -173,10 +181,16 @@ class CourseBreadController extends Controller
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
+        if (Auth::user()->can('create_global', Student::class)) {
+            $region = Region::toDropDown();
+        } else {
+            $region = [getNameById('region', User::getRegion())];
+        }
+
         $options_ = array(
             'supervisor' => Supervisor::toDropDown(),
             'teacher' => Teacher::toDropDown(),
-            'region' => Region::toDropDown(),
+            'region' => $region,
             'venue' => Venue::toDropDown(),
             'field' => Course_Field::toDropDown(),
             'type' => Course_Type::toDropDown()
@@ -198,6 +212,8 @@ class CourseBreadController extends Controller
 // POST BRE(A)D
     public function store(Request $request)
     {
+        $this->authorize('create', Course::class);
+
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
@@ -298,26 +314,26 @@ class CourseBreadController extends Controller
             $data->{$row->field} = $content;
         }
 
-        $this->authorize('insertUpdateData', $data);
-
         $this->validate($request, $rules);
 
-        $data->save();
+        DB::transaction(function () use ($data, $request) {
+            $data->save();
 
-        $course_id = $data->id;
-        $students = $request->input('students_ids');
-        foreach ($students as $id) {
-            Course_Student::updateOrCreate(
-                ['course_id' => $course_id, 'student_id' => $id,]
-            );
+            $course_id = $data->id;
+            $students = $request->input('students_ids');
+            foreach ($students as $id) {
+                Course_Student::updateOrCreate(
+                    ['course_id' => $course_id, 'student_id' => $id,]
+                );
 
-            Course_Student::where('course_id', '=', $course_id)
-                ->where('student_id', '=', $id)
-                ->update([
-                    'status' => $request->input('students_grade')[$id][0],
-                    'grade' => $request->input('students_grade')[$id][1]
-                ]);
-        }
+                Course_Student::where('course_id', '=', $course_id)
+                    ->where('student_id', '=', $id)
+                    ->update([
+                        'status' => $request->input('students_grade')[$id][0],
+                        'grade' => $request->input('students_grade')[$id][1]
+                    ]);
+            }
+        });
 
     }
 

@@ -56,7 +56,7 @@ class Handler extends ExceptionHandler
             return redirect('admin')->with([
                 'message' => "sorry, You don't have permission",
                 'alert-type' => 'error',
-            ]);;
+            ]);
         }
         return parent::render($request, $exception);
     }

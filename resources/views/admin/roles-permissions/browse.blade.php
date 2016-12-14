@@ -1,14 +1,16 @@
 @extends('voyager::master')
 
 @section('page_header')
-    @can('create', \App\Models\Course::class)
+
     <h1 class="page-title">
         <i class="{{ $dataType->icon }}"></i> {{ $dataType->display_name_plural }}
+        @can('roles_permissions', \App\Models\Role_Permission::class)
         <a href="{{ route($dataType->slug.'.create') }}" class="btn btn-success">
             <i class="voyager-plus"></i> Add New
         </a>
+        @endcan
     </h1>
-    @endcan
+
 @stop
 
 @section('page_header_actions')

@@ -4,9 +4,11 @@
     @can('create', \App\Models\Course::class)
     <h1 class="page-title">
         <i class="{{ $dataType->icon }}"></i> {{ $dataType->display_name_plural }}
+        @can('create', \App\Models\Course::class)
         <a href="{{ route($dataType->slug.'.create') }}" class="btn btn-success">
             <i class="voyager-plus"></i> Add New
         </a>
+        @endcan
     </h1>
     @endcan
 @stop
@@ -62,10 +64,12 @@
                                             <i class="voyager-edit"></i> Edit
                                         </a>
                                         @endcan
+                                        @can('view', $data)
                                         <a href="{{ route($dataType->slug.'.show', $data->id) }}"
                                            class="btn-sm btn-warning pull-right">
                                             <i class="voyager-eye"></i> View
                                         </a>
+                                        @endcan
                                     </td>
                                 </tr>
                             @endforeach

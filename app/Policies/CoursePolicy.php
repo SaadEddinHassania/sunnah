@@ -3,6 +3,8 @@
 namespace App\Policies;
 
 use App\Models\Course;
+use App\Models\Permission;
+use App\Models\Role_Permission;
 use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -20,18 +22,23 @@ class CoursePolicy
 
     public function view(User $user, Course $course)
     {
-        error_log('class:' . get_class($this). '--'. __FUNCTION__);
         if (User::isAdmin()) return true;
 
-        $c = $user->join('supervisors', 'users.id', 'supervisors.user_id')
-            ->where('supervisors.user_id', '=', $user->id)
-            ->where('supervisors.region_id', '=', $course->region_id)
-            ->count();
+        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
+            ->select('global')
+            ->first();
 
-        if ($c > 0) {
+        if ($global === null) {
+            return false;
+        } elseif ($global) {
             return true;
+        } else {
+            return $user->join('supervisors', 'users.id', 'supervisors.user_id')
+                ->where('supervisors.user_id', '=', $user->id)
+                ->where('supervisors.region_id', '=', $course->region_id)
+                ->exists();
         }
-        return false;
     }
 
     /**
@@ -44,28 +51,9 @@ class CoursePolicy
     {
         if (User::isAdmin()) return true;
 
-        $c = $user->join('supervisors', 'users.id', 'supervisors.user_id')
-            ->where('supervisors.user_id', '=', $user->id)
-            ->count();
-
-        if ($c > 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public function insertUpdateData(User $user, Course $course)
-    {
-        if (User::isAdmin()) return true;
-
-        $c = $user->join('supervisors', 'users.id', 'supervisors.user_id')
-            ->where('supervisors.user_id', '=', $user->id)
-            ->count();
-
-        if ($c > 0) {
-            return true;
-        }
-        return false;
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
+            ->exists();
     }
 
     /**
@@ -79,30 +67,21 @@ class CoursePolicy
     {
         if (User::isAdmin()) return true;
 
-        $c = $user->join('supervisors', 'users.id', 'supervisors.user_id')
-            ->where('supervisors.user_id', '=', $user->id)
-            ->where('supervisors.region_id', '=', $course->region_id)
-            ->count();
+        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
+            ->select('global')
+            ->first();
 
-        if ($c > 0) {
+        if ($global === null) {
+            return false;
+        } elseif ($global) {
             return true;
+        } else {
+            return $user->join('supervisors', 'users.id', 'supervisors.user_id')
+                ->where('supervisors.user_id', '=', $user->id)
+                ->where('supervisors.region_id', '=', $course->region_id)
+                ->exists();
         }
-        return false;
-    }
-
-
-    public function edit(User $user, Course $course)
-    {
-        if (User::isAdmin()) return true;
-
-        $c = $user->join('supervisors', 'users.id', 'supervisors.user_id')
-            ->where('supervisors.user_id', '=', $user->id)
-            ->where('supervisors.region_id', '=', $course->region_id)
-            ->count();
-        if ($c > 0) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -116,14 +95,49 @@ class CoursePolicy
     {
         if (User::isAdmin()) return true;
 
-        $c = $user->join('supervisors', 'users.id', 'supervisors.user_id')
-            ->where('supervisors.user_id', '=', $user->id)
-            ->where('supervisors.region_id', '=', $course->region_id)
-            ->count();
-        if ($c > 0) {
+        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
+            ->select('global')
+            ->first();
+
+        if ($global === null) {
+            return false;
+        } elseif ($global) {
             return true;
+        } else {
+            return $user->join('supervisors', 'users.id', 'supervisors.user_id')
+                ->where('supervisors.user_id', '=', $user->id)
+                ->where('supervisors.region_id', '=', $course->region_id)
+                ->exists();
         }
-        return false;
+    }
+
+    public function create_global(User $user)
+    {
+        if (User::isAdmin()) return true;
+
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId('create', class_basename(__CLASS__)))
+            ->where('global', '=', 1)
+            ->exists();
+    }
+
+    public function view_global(User $user)
+    {
+        if (User::isAdmin()) return true;
+
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId('view', class_basename(__CLASS__)))
+            ->where('global', '=', 1)
+            ->exists();
+    }
+
+    public function view_local(User $user)
+    {
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId('view', class_basename(__CLASS__)))
+            ->where('global', '=', 0)
+            ->exists();
     }
 
 }

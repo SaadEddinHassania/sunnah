@@ -85,10 +85,10 @@
                                                 $dataTypeContent->{$row->field}) : old($row->field); ?>
                                         <select class="form-control"
                                                 name="{{ $row->field }}"
-                                            @cannot('create_global', \App\Models\Student::class)
+                                                @cannot('create_global', \App\Models\Student::class)
                                                 @if(!$row->edit) disabled @endif
-                                            @endcannot
-                                            @if(!$row->edit && isset($dataTypeContent->id)) disabled @endif>
+                                                @endcannot
+                                                @if(!$row->edit && isset($dataTypeContent->id)) disabled @endif>
                                             <?php $default = (isset($options->default) && !isset($dataTypeContent->{$row->field})) ? $options->default : NULL; ?>
                                             @if(isset($options->$field_name))
                                                 @foreach($options->$field_name as $key => $option)
@@ -171,6 +171,10 @@
     <script>
         $('document').ready(function () {
             $('.toggleswitch').bootstrapToggle();
+            if ($('[type="date"]').prop('type') != 'date') {
+                $('[type="date"]').datepicker();
+            }
+
             @if(isset($dataTypeContent->id))
                 $('select').select2({
                 theme: "bootstrap",

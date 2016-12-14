@@ -23,27 +23,42 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        $c = $user->join('supervisors', 'users.id', 'supervisors.user_id')
-            ->where('supervisors.user_id', '=', $user->id)
-            ->where('supervisors.region_id', '=', $supervisor->region_id)
-            ->count();
+        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
+            ->select('global')
+            ->first();
 
-
-        error_log('count=: ' . $c);
-        if ($c > 0) {
+        if ($global === null) {
+            return false;
+        } elseif ($global) {
             return true;
+        } else {
+            return $user->join('supervisors', 'users.id', 'supervisors.user_id')
+                ->where('supervisors.user_id', '=', $user->id)
+                ->where('supervisors.region_id', '=', $supervisor->region_id)
+                ->exists();
         }
-        return false;
     }
 
     public function view_teacher(User $user, Supervisor $supervisor)
     {
-        if ($this->view_teacher_global($user)) return true;
+        if (User::isAdmin()) return true;
 
-        return $user->join('supervisors', 'users.id', 'supervisors.user_id')
-            ->where('supervisors.user_id', '=', $user->id)
-            ->where('supervisors.region_id', '=', $supervisor->region_id)
-            ->exists() && $supervisor->role_id == 3;
+        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
+            ->select('global')
+            ->first();
+
+        if ($global === null) {
+            return false;
+        } elseif ($global) {
+            return true;
+        } else {
+            return $user->join('supervisors', 'users.id', 'supervisors.user_id')
+                ->where('supervisors.user_id', '=', $user->id)
+                ->where('supervisors.region_id', '=', $supervisor->region_id)
+                ->exists() && $supervisor->role_id == 3;
+        }
     }
 
     /**
@@ -56,7 +71,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        return Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->exists();
     }
@@ -65,7 +80,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        return Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->exists();
     }
@@ -81,7 +96,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        $global = Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->select('global')
             ->first();
@@ -102,7 +117,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        $global = Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->select('global')
             ->first();
@@ -130,7 +145,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        $global = Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->select('global')
             ->first();
@@ -151,7 +166,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        $global = Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->select('global')
             ->first();
@@ -172,7 +187,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        return Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId('create', class_basename(__CLASS__)))
             ->where('global', '=', 1)
             ->exists();
@@ -182,7 +197,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        return Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId('view', class_basename(__CLASS__)))
             ->where('global', '=', 1)
             ->exists();
@@ -190,7 +205,7 @@ class SupervisorPolicy
 
     public function view_local(User $user)
     {
-        return Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId('view', class_basename(__CLASS__)))
             ->where('global', '=', 0)
             ->exists();
@@ -200,7 +215,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        return Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId('create_teacher', class_basename(__CLASS__)))
             ->where('global', '=', 1)
             ->exists();
@@ -210,7 +225,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        return Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId('view_teacher', class_basename(__CLASS__)))
             ->where('global', '=', 1)
             ->exists();
@@ -218,7 +233,7 @@ class SupervisorPolicy
 
     public function view_teacher_local(User $user)
     {
-        return Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId('view_teacher', class_basename(__CLASS__)))
             ->where('global', '=', 0)
             ->exists();
@@ -228,7 +243,7 @@ class SupervisorPolicy
     {
         if (User::isAdmin()) return true;
 
-        return Role_Permission::where('role_id', '=', User::geyRoleId($user->id))
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->exists();
     }

@@ -186,6 +186,10 @@
     <script>
         $('document').ready(function () {
             $('.toggleswitch').bootstrapToggle();
+            if ($('[type="date"]').prop('type') != 'date') {
+                $('[type="date"]').datepicker();
+            }
+
             @if(isset($dataTypeContent->id))
                 $('select').select2({
                 theme: "bootstrap",

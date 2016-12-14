@@ -12,18 +12,16 @@ class SpecializationsTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('specializations')->delete();
-        
-        \DB::table('specializations')->insert(array (
-            0 => 
-            array (
-                'id' => 1,
-                'name' => 'تكنولوجيا المعلومات'
-            ),
-        ));
-        
-        
+
+        \DB::table('specializations')->insert(
+            array(
+                array('id' => 1, 'name' => 'تكنولوجيا المعلومات'),
+            )
+        );
+
+
     }
 }

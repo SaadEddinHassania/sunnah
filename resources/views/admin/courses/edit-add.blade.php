@@ -194,23 +194,27 @@
                                                             </div>
                                                             <div class='col-xs-4 group-student'>
                                                                 <select class='form-control'
+                                                                        val = {{$s->status}}
                                                                         name='students_grade[{{$s->user_id}}][]'>
+
                                                                     <option value='1'
                                                                             @if($s->status == 1)selected="selected"@endif>
-                                                                        aaa
+                                                                        Tested
                                                                     </option>
                                                                     <option value='2'
                                                                             @if($s->status == 2)selected="selected"@endif>
-                                                                        bbb
+                                                                        attended
                                                                     </option>
                                                                     <option value='3'
                                                                             @if($s->status == 3)selected="selected"@endif>
-                                                                        ccc
+                                                                        not attend
                                                                     </option>
+
                                                                 </select>
                                                             </div>
                                                             <div class='col-xs-4 group-student'>
                                                                 <input class='form-control' type='number'
+                                                                       min="0" max="100"
                                                                        name='students_grade[{{$s->user_id}}][]'
                                                                        value="{{$s->grade}}"
                                                                        placeholder='grade'/>
@@ -259,6 +263,10 @@
         var add_student = $('#add_student');
 
         $('document').ready(function () {
+            $('.toggleswitch').bootstrapToggle();
+            if ($('[type="date"]').prop('type') != 'date') {
+                $('[type="date"]').datepicker();
+            }
 
             @if(isset($dataTypeContent->id))
                 $('select').select2({
@@ -276,6 +284,7 @@
                         hidden: true
                     }]
             });
+            $('select[val="-1"]').select2("val", "");
             getStudentByRegion({{$region_id}});
             @else
                 $('select').select2({
@@ -296,7 +305,6 @@
                     }]
             });
             @endif
-            $('.toggleswitch').bootstrapToggle();
         });
 
         add_student.on("change", function (e) {
@@ -310,15 +318,15 @@
                     "<input type='hidden' name='students_ids[]' value='" + add_student.val() + "'/>" +
                     "<div class='row'>" +
                     "<div class='col-xs-4 group-student'>" +
-                    "<label class='form-control'>" + add_student.text() + "</label></div>" +
+                    "<label class='form-control'>" + this.options[this.selectedIndex].text + "</label></div>" +
                     "<div class='col-xs-4 group-student'>" +
                     "<select class='form-control students_grade" + add_student.val() + "' name='students_grade[" + add_student.val() + "][]'>" +
-                    "<option value='1'>aaa</option>" +
-                    "<option value='2'>bbb</option>" +
-                    "<option value='3'>ccc</option>" +
+                    "<option value='1'>Tested</option>" +
+                    "<option value='2'>attend</option>" +
+                    "<option value='3'>not attend</option>" +
                     "</select></div>" +
                     "<div class='col-xs-4 group-student'>" +
-                    "<input class='form-control' type='number' name='students_grade[" + add_student.val() + "][]' placeholder='grade'/>" +
+                    "<input class='form-control' type='number' min='0' max='100' value='0' name='students_grade[" + add_student.val() + "][]' placeholder='grade'/>" +
                     "</div></div></li>");
             setDropDown($('.students_grade' + add_student.val()));
             add_student.val(-1);

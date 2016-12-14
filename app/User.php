@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Role_Permission;
 use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\User_Role;
@@ -68,11 +69,6 @@ class User extends Authenticatable
         return $name == $this->supervisor()->role->name;
     }
 
-    public function hasPermission($name)
-    {
-        return in_array($name, Arr::pluck($this->supervisor()->role()->permissions->toArray(), 'name'));
-    }
-
     public function setRole($name)
     {
         // If user does not already have this role
@@ -108,7 +104,7 @@ class User extends Authenticatable
         return Supervisor::where('user_id', '=', Auth::user()->id)->first()->region_id;
     }
 
-    public static function geyRoleId($id)
+    public static function getRoleId($id)
     {
         return User::join('supervisors', 'users.id', 'supervisors.user_id')
             ->where('supervisors.user_id', '=', $id)
@@ -116,4 +112,15 @@ class User extends Authenticatable
             ->first()
             ->role_id;
     }
+
+    public static function hasPermission($perm_name)
+    {
+        if (self::isAdmin()) return true;
+
+        return Role_Permission::join('permissions', 'permissions.id', 'roles_permissions.permission_id')
+            ->where('role_id', '=', self::getRoleId(Auth::user()->id))
+            ->where('func_name', '=', $perm_name)
+            ->exists();
+    }
+
 }

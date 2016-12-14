@@ -12,18 +12,17 @@ class RegionsTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('regions')->delete();
-        
-        \DB::table('regions')->insert(array (
-            0 => 
-            array (
-                'id' => 1,
-                'name' => "شرق غزة",
-            ),
-        ));
-        
-        
+
+        \DB::table('regions')->insert(
+            array(
+                0 =>
+                    array('id' => 1, 'name' => "شرق غزة",),
+            )
+        );
+
+
     }
 }

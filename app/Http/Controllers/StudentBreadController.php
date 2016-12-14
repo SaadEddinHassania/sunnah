@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Course;
 use App\Models\Qualification;
 use App\Models\Region;
 use App\Models\Specialization;
 use App\Models\Student;
-use App\Models\Supervisor;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use TCG\Voyager\Models\DataType;
 
 class StudentBreadController extends Controller
@@ -183,10 +182,10 @@ class StudentBreadController extends Controller
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
-        if (User::isAdmin() || Auth::user()->can('create_global', Student::class)) {
+        if (Auth::user()->can('create_global', Student::class)) {
             $region = Region::toDropDown();
         } else {
-            $region = [getNameById('region', \App\User::getRegion())];
+            $region = [getNameById('region', User::getRegion())];
         }
 
         $options_ = array(
@@ -211,6 +210,8 @@ class StudentBreadController extends Controller
 // POST BRE(A)D
     public function store(Request $request)
     {
+        $this->authorize('create', Student::class);
+
         $slug = $request->segment(2);
         $dataType = DataType::where('slug', '=', $slug)->first();
 
@@ -337,11 +338,14 @@ class StudentBreadController extends Controller
         $this->validate($request, $rules);
 
         $user_data->is_deleted = 0;
-        $user_data->save();
 
-        $data->user_id = $user_data->id;
-        $data->region_id = $region_id;
-        $data->save();
+        DB::transaction(function () use ($data, $user_data, $region_id) {
+            $user_data->save();
+
+            $data->user_id = $user_data->id;
+            $data->region_id = $region_id;
+            $data->save();
+        });
 
     }
 
