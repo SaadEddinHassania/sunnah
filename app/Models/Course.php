@@ -17,6 +17,10 @@ class Course extends Model
 {
     protected $table = 'courses';
 
+    public function courses(){
+        return $this->belongsToMany(Student::class);
+    }
+
     public function rows()
     {
         return $this->join('supervisor', 'supervisor.id', '=', 'courses.supervisor_id')

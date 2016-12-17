@@ -7,9 +7,11 @@ use App\Models\Region;
 use App\Models\Specialization;
 use App\Models\Student;
 use App\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use TCG\Voyager\Models\DataType;
 
 class StudentBreadController extends Controller
@@ -373,6 +375,23 @@ class StudentBreadController extends Controller
                 $content = 0;
                 break;
 
+            /********** DATE TYPE **********/
+            case 'date':
+
+                $date = $request->input($row->field);
+
+                if (isset($date)) {
+
+                    if ($date == '') {
+                        return null;
+                    }
+
+                    return $date;
+                }
+
+                return null;
+                break;
+
             /********** FILE TYPE **********/
             case 'file':
                 $file = $request->file($row->field);
@@ -476,5 +495,34 @@ class StudentBreadController extends Controller
         return Student::join('users', 'students.user_id', 'users.id')
             ->where('region_id', '=', $region_id)
             ->pluck('students.user_id', 'users.name');
+    }
+
+    public function getReport()
+    {
+//        $students = Student::join('users', 'students.user_id', '=', 'users.id')->get();
+
+
+//        return $studentsColl;
+//        return;
+        Excel::create('Filename', function ($excel) {
+
+            $excel->setTitle('Our new awesome title');
+
+            $excel->sheet('Sheetname', function ($sheet) {
+                $sheet->setRightToLeft(true);
+                $students = Student::with('user')->get()->except('dob');
+
+                foreach ($students as $key => $student) {
+                    $student = collect($student);
+
+                    $students[$key] = $student->except(['user.id'])->collapse()->merge($student)->except('user');
+                }
+                $sheet->fromArray(
+                    $students
+                );
+
+            });
+
+        })->export('xlsx');
     }
 }

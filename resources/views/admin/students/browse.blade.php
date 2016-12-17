@@ -8,12 +8,17 @@
             <i class="voyager-plus"></i> Add New
         </a>
         @endcan
+        @can('create', \App\Models\Student::class)
+            <a href="{{ route($dataType->slug.'.report') }}" class="btn btn-success">
+                <i class="voyager-plus"></i> Export
+            </a>
+        @endcan
     </h1>
 @stop
 
 @section('page_header_actions')
 
-@stop
+@stopindex.blade.php
 
 @section('content')
     <div class="page-content container-fluid">

@@ -11,6 +11,20 @@ class Student extends Model
     
     public $timestamps = false;
 
+//    protected $appends = array('name');
+
+//    public function getNameAttribute()
+//    {
+//        return $this->user->name;
+//    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+    public function courses(){
+        return $this->belongsToMany(Course::class);
+    }
+
     public static function getName($id)
     {
         return Student::join('users', 'students.user_id', 'users.id')
@@ -37,4 +51,5 @@ class Student extends Model
         error_log('data= ' . json_encode($dd));
         return $dd;
     }
+
 }

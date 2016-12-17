@@ -20,10 +20,10 @@ class CreateStudentsTable extends Migration
             $table->integer('region_id')->unsigned()->index();
             $table->foreign('region_id')->references('id')->on('regions')->onDelete('RESTRICT ');
 
-            $table->string('personal_id')->nullanle();
-            $table->string('mobile')->nullanle();
-            $table->date('dob')->nullanle();
-            $table->string('address')->nullanle();
+            $table->string('personal_id')->nullable();
+            $table->string('mobile')->nullable();
+            $table->date('dob')->nullable();
+            $table->string('address')->nullable();
             $table->timestamps();
 
         });

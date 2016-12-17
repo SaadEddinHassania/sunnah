@@ -21,6 +21,8 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('admin/studentsR/{region_id}', 'StudentBreadController@getStudentByRegion');
 
+Route::get('aa', 'StudentBreadController@getReport')->name('students.report');
+
 //Route::get('admin/venuesR/{region_id}', 'VenueBreadController@getVenuesByRegion');
 
 Route::get('admin/coursesRY/{region_id}', 'CourseBreadController@getSNByRegion');
