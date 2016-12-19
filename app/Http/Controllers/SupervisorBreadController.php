@@ -274,25 +274,34 @@ class SupervisorBreadController extends Controller
         }
 
         $dataType = DataType::where('slug', '=', $slug)->first();
-
-
+        
         if ($request->segment(2) == 'teachers') {
             $dataType->display_name_plural = 'Teachers';
             $dataType->display_name_singular = 'Teacher';
             $dataType->slug = 'teachers';
+            $role = ['Teacher'];
+
+            if (Auth::user()->can('create_teacher_global', Supervisor::class)) {
+                $region = Region::toDropDown();
+            } else {
+                $region = [getNameById('region', \App\User::getRegion())];
+            }
+        }else{
+            if (Auth::user()->can('create_global', Supervisor::class)) {
+                $region = Region::toDropDown();
+            } else {
+                $region = [getNameById('region', \App\User::getRegion())];
+            }
+            $role = Role::toDropDown();
         }
 
-        if (Auth::user()->can('create_teacher_global', Supervisor::class)) {
-            $region = Region::toDropDown();
-        } else {
-            $region = [getNameById('region', \App\User::getRegion())];
-        }
+
 
         $options_ = array(
             'specialization' => Specialization::toDropDown(),
             'qualification' => Qualification::toDropDown(),
             'region' => $region,
-            'role' => ['Teacher']
+            'role' => $role
         );
         $options_ = json_encode($options_);
 

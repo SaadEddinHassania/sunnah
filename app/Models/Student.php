@@ -11,18 +11,35 @@ class Student extends Model
     
     public $timestamps = false;
 
-//    protected $appends = array('name');
+    protected $appends = array('المنطقة','الاسم','تاريخ الميلاد','رقم الجوال');
 
-//    public function getNameAttribute()
-//    {
-//        return $this->user->name;
-//    }
+    public function getالاسمAttribute()
+    {
+        return $this->user->name;
+    }
+
+    public function getالمنطقةAttribute()
+    {
+        return $this->region->name;
+    }
+    public function getتاريخالميلادAttribute()
+    {
+        return $this->dob;
+    }
+    public function getرقمالجوالAttribute()
+    {
+        return $this->mobile;
+    }
 
     public function user(){
         return $this->belongsTo(User::class);
     }
     public function courses(){
-        return $this->belongsToMany(Course::class);
+        return $this->belongsToMany(Course::class,'course_student','student_id','user_id');
+    }
+
+    public function region(){
+        return $this->belongsTo(Region::class);
     }
 
     public static function getName($id)
@@ -44,11 +61,16 @@ class Student extends Model
     public static function getStudentsByCourse($course_id)
     {
         $dd = Student::join('users', 'students.user_id', 'users.id')
-            ->join('course_students', 'users.id', 'course_students.student_id')
-            ->where('course_students.course_id', '=', $course_id)
-            ->select('users.name', 'students.user_id', 'course_students.status', 'course_students.grade')
+            ->join('course_student', 'users.id', 'course_student.student_id')
+            ->where('course_student.course_id', '=', $course_id)
+            ->select('users.name', 'students.user_id', 'course_student.status', 'course_student.grade')
             ->get();
-        error_log('data= ' . json_encode($dd));
+
+        $dd = Course::with('students','students.user')->find($course_id);
+        dd(Course::find($course_id)->get()->toJson());
+        dd($dd);
+        dd($dd);
+        error_log('data= ' . $dd);
         return $dd;
     }
 

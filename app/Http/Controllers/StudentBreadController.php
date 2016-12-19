@@ -94,7 +94,7 @@ class StudentBreadController extends Controller
             ->select('users.name', 'users.email', 'students.*')
             ->first();
 
-        return view('admin.courses.read', compact('dataType', 'dataTypeContent'));
+        return view('admin.students.read', compact('dataType', 'dataTypeContent'));
     }
 
     //***************************************
@@ -504,25 +504,29 @@ class StudentBreadController extends Controller
 
 //        return $studentsColl;
 //        return;
+
+
         Excel::create('Filename', function ($excel) {
 
             $excel->setTitle('Our new awesome title');
 
             $excel->sheet('Sheetname', function ($sheet) {
                 $sheet->setRightToLeft(true);
-                $students = Student::with('user')->get()->except('dob');
+                $students =  Student::get();
 
-                foreach ($students as $key => $student) {
-                    $student = collect($student);
+                $st = $students->map(function ($student) {
+                    return collect($student->toArray())
+                        ->only(['id','الاسم','تاريخ الميلاد','رقم الجوال',''])
+                        ->all();
+                });
 
-                    $students[$key] = $student->except(['user.id'])->collapse()->merge($student)->except('user');
-                }
                 $sheet->fromArray(
-                    $students
+                    $st
                 );
 
             });
 
-        })->export('xlsx');
+        })->download('xls');
+
     }
 }

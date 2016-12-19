@@ -9,7 +9,7 @@ use App\Models\Student;
 use App\Models\Supervisor;
 use App\Policies\CoursePolicy;
 use App\Policies\RolePermissionsPolicy;
-use App\Policies\RolePolicy;
+//use App\Policies\RolePolicy;
 use App\Policies\SettingPolicy;
 use App\Policies\StudentPolicy;
 use App\Policies\SupervisorPolicy;
@@ -32,7 +32,7 @@ class AuthServiceProvider extends ServiceProvider
         Setting::class => SettingPolicy::class,
         Student::class => StudentPolicy::class,
         Supervisor::class => SupervisorPolicy::class,
-        Role::class => RolePolicy::class,
+//        Role::class => RolePolicy::class,
         Role_Permission::class => RolePermissionsPolicy::class,
     ];
 

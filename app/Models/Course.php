@@ -17,8 +17,8 @@ class Course extends Model
 {
     protected $table = 'courses';
 
-    public function courses(){
-        return $this->belongsToMany(Student::class);
+    public function students(){
+        return $this->belongsToMany(Student::class,'course_student','student_id','student_id');
     }
 
     public function rows()

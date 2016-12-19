@@ -9,7 +9,7 @@
         </a>
         @endcan
         @can('create', \App\Models\Student::class)
-            <a href="{{ route($dataType->slug.'.report') }}" class="btn btn-success">
+            <a href="{{ route('admin.'.$dataType->slug.'.report') }}" class="btn btn-success">
                 <i class="voyager-plus"></i> Export
             </a>
         @endcan
@@ -55,19 +55,19 @@
                                         @can('delete', $data)
                                         <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
                                              id="delete-{{ $data->id }}">
-                                            <i class="voyager-trash"></i> Delete
+                                            <i class="voyager-trash"></i>
                                         </div>
                                         @endcan
                                         @can('update', $data)
                                         <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
                                            class="btn-sm btn-primary pull-right edit">
-                                            <i class="voyager-edit"></i> Edit
+                                            <i class="voyager-edit"></i>
                                         </a>
                                         @endcan
                                         @can('view', $data)
                                         <a href="{{ route($dataType->slug.'.show', $data->id) }}"
                                            class="btn-sm btn-warning pull-right">
-                                            <i class="voyager-eye"></i> View
+                                            <i class="voyager-eye"></i>
                                         </a>
                                         @endcan
                                     </td>
