@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Course;
 use App\Models\Role_Permission;
 use App\Models\Student;
 use App\Models\Supervisor;
@@ -66,7 +67,10 @@ class User extends Authenticatable
 
     public function hasRole($name)
     {
-        return $name == $this->supervisor()->role->name;
+        if (count($this->supervisor)) {
+            return $name == $this->supervisor()->role->name;
+        }
+
     }
 
     public function setRole($name)
@@ -123,4 +127,12 @@ class User extends Authenticatable
             ->exists();
     }
 
+    public function courses(){
+        return $this->belongsToMany(Course::class);
+    }
+
+    public function students()
+    {
+        return $this->hasManyThrough('App\Student', 'App\User');
+    }
 }

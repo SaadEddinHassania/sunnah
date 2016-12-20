@@ -515,6 +515,23 @@ class SupervisorBreadController extends Controller
                 }
                 break;
 
+            /********** DATE TYPE **********/
+            case 'date':
+
+                $date = $request->input($row->field);
+
+                if (isset($date)) {
+
+                    if ($date == '') {
+                        return null;
+                    }
+
+                    return $date;
+                }
+
+                return null;
+                break;
+
             /********** CHECKBOX TYPE **********/
             case 'checkbox':
                 $checkBoxRow = $request->input($row->field);

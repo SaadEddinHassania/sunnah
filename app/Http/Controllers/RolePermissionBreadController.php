@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Course_Field;
-use App\Models\Course_Student;
+use App\Models\CourseUser;
 use App\Models\Course_Type;
 use App\Models\Permission;
 use App\Models\Region;

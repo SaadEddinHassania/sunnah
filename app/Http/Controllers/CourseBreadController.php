@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Course_Field;
-use App\Models\Course_Student;
+use App\Models\CourseUser;
 use App\Models\Course_Type;
 use App\Models\Region;
 use App\Models\Student;
@@ -322,12 +322,12 @@ class CourseBreadController extends Controller
             $course_id = $data->id;
             $students = $request->input('students_ids');
             foreach ($students as $id) {
-                Course_Student::updateOrCreate(
-                    ['course_id' => $course_id, 'student_id' => $id,]
+                CourseUser::updateOrCreate(
+                    ['course_id' => $course_id, 'user_id' => $id,]
                 );
 
-                Course_Student::where('course_id', '=', $course_id)
-                    ->where('student_id', '=', $id)
+                CourseUser::where('course_id', '=', $course_id)
+                    ->where('user_id', '=', $id)
                     ->update([
                         'status' => $request->input('students_grade')[$id][0],
                         'grade' => $request->input('students_grade')[$id][1]

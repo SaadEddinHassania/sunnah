@@ -20,7 +20,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('test',function(){
-    return \App\Models\Student::with('courses')->get();
+    return \App\Models\Student::all();
     return Course::with('students')->get();
 });
 
