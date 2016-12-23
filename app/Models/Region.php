@@ -20,4 +20,8 @@ class Region extends Model
     {
         return Region::pluck('name','id');
     }
+
+    public function courses(){
+        return $this->hasMany(Course::class);
+    }
 }

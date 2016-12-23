@@ -58,16 +58,11 @@ class Student extends Model
     public static function getStudentsByCourse($course_id)
     {
         $dd = Student::join('users', 'students.user_id', 'users.id')
-            ->join('course_student', 'users.id', 'course_student.student_id')
-            ->where('course_student.course_id', '=', $course_id)
-            ->select('users.name', 'students.user_id', 'course_student.status', 'course_student.grade')
+            ->join('course_user', 'users.id', 'course_user.user_id')
+            ->where('course_user.course_id', '=', $course_id)
+            ->select('users.name', 'students.user_id', 'course_user.status', 'course_user.grade')
             ->get();
 
-        $dd = Course::with('students','students.user')->find($course_id);
-        dd(Course::find($course_id)->get()->toJson());
-        dd($dd);
-        dd($dd);
-        error_log('data= ' . $dd);
         return $dd;
     }
 

@@ -17,10 +17,6 @@ class Course extends Model
 {
     protected $table = 'courses';
 
-    public function users(){
-        return $this->belongsToMany(User::class);
-    }
-
     public function rows()
     {
         return $this->join('supervisor', 'supervisor.id', '=', 'courses.supervisor_id')
@@ -40,4 +36,27 @@ class Course extends Model
         }
         return 'permission';
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
+
+    public function supervisor(){
+        return $this->belongsTo(Supervisor::class, 'supervisor_id', 'user_id')->with('user');
+    }
+
+    public function teacher(){
+        return $this->belongsTo(Teacher::class, 'teacher_id', 'user_id')->with('user');
+    }
+
+    public function venue(){
+        return $this->belongsTo(Venue::class);
+    }
+
 }

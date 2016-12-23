@@ -497,33 +497,38 @@ class StudentBreadController extends Controller
             ->pluck('students.user_id', 'users.name');
     }
 
-    public function getReport()
+    public function getReport(Request $request)
     {
-//        $students = Student::join('users', 'students.user_id', '=', 'users.id')->get();
+        $slug = $request->segment(2);
 
+        $dataType = DataType::where('slug', '=', $slug)->first();
+        $toReport = array();
+        $modelName = $dataType->model_name;
+        $dataTypeContent = $modelName::all();
 
-//        return $studentsColl;
-//        return;
+        foreach ($dataTypeContent as $data) {
+            $c = array();
+            foreach ($dataType->browseRows as $row) {
+                if ($row->type == 'select_dropdown') {
+                    $c[$row->display_name] = getNameById($row->field, $data->{$row->field});
+                } elseif ($row->field == 'name') {
+                    $c[$row->display_name] = $data->user->name;
+                }elseif ($row->field == 'email') {
+                    $c[$row->display_name] = $data->user->email;
+                } else {
+                    $c[$row->display_name] = $data->{$row->field};
+                }
+            }
+            $toReport[] = $c;
+        }
 
+        Excel::create($slug, function ($excel) use ($slug, $toReport) {
 
-        Excel::create('Filename', function ($excel) {
+            $excel->setTitle($slug);
 
-            $excel->setTitle('Our new awesome title');
-
-            $excel->sheet('Sheetname', function ($sheet) {
+            $excel->sheet($slug, function ($sheet) use ($toReport) {
                 $sheet->setRightToLeft(true);
-                $students =  Student::get();
-
-                $st = $students->map(function ($student) {
-                    return collect($student->toArray())
-                        ->only(['id','الاسم','تاريخ الميلاد','رقم الجوال',''])
-                        ->all();
-                });
-
-                $sheet->fromArray(
-                    $st
-                );
-
+                $sheet->fromArray($toReport);
             });
 
         })->download('xls');

@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Role_Permission;
 use App\Models\Student;
 use App\Models\Supervisor;
+use App\Models\Teacher;
 use App\Models\User_Role;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -47,6 +48,11 @@ class User extends Authenticatable
     public function supervisor()
     {
         return $this->hasOne(Supervisor::class);
+    }
+
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class, 'id', 'user_id');
     }
 
     public function is_admin()

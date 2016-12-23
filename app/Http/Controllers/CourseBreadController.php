@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Constraint;
 use Intervention\Image\Facades\Image;
+use Maatwebsite\Excel\Facades\Excel;
 use TCG\Voyager\Models\DataType;
 
 class CourseBreadController extends Controller
@@ -48,6 +49,10 @@ class CourseBreadController extends Controller
             $dataTypeContent = Course::all();
         } elseif (Auth::user()->can('view_local', Course::class)) {
             $dataTypeContent = Course::where('region_id', '=', User::getRegion())->get();
+        } elseif (Auth::user()->can('view_concerning', Course::class)) {
+            $dataTypeContent = Course::where('supervisor_id', Auth::user()->id)
+                ->orWhere('teacher_id', Auth::user()->id)
+                ->get();
         } else {
             return redirect('admin')
                 ->with([
@@ -117,9 +122,22 @@ class CourseBreadController extends Controller
 
         $this->authorize('update', $dataTypeContent);
 
+        if (Auth::user()->can('update_concerning', Course::class) && !User::isAdmin()) {
+            if (Auth::user()->supervisor->role->name == 'teacher') {
+                $teachers = [Auth::user()->name];
+                $supervisors = Supervisor::toDropDown();
+            } else {
+                $teachers = Teacher::toDropDown();
+                $supervisors = [Auth::user()->name];
+            }
+        } else {
+            $teachers = Teacher::toDropDown();
+            $supervisors = Supervisor::toDropDown();
+        }
+
         $options_ = array(
-            'supervisor' => Supervisor::toDropDown(),
-            'teacher' => Teacher::toDropDown(),
+            'supervisor' => $supervisors,
+            'teacher' => $teachers,
             'region' => [getNameById('region', $dataTypeContent->region_id)],
             'venue' => Venue::toDropDown(),
             'field' => Course_Field::toDropDown(),
@@ -187,9 +205,22 @@ class CourseBreadController extends Controller
             $region = [getNameById('region', User::getRegion())];
         }
 
+        if (Auth::user()->can('create_concerning', Course::class)) {
+            if (Auth::user()->supervisor->role->name == 'teacher') {
+                $teachers = [Auth::user()->name];
+                $supervisors = Supervisor::toDropDown();
+            } else {
+                $teachers = Teacher::toDropDown();
+                $supervisors = [Auth::user()->name];
+            }
+        } else {
+            $teachers = Teacher::toDropDown();
+            $supervisors = Supervisor::toDropDown();
+        }
+
         $options_ = array(
-            'supervisor' => Supervisor::toDropDown(),
-            'teacher' => Teacher::toDropDown(),
+            'supervisor' => $supervisors,
+            'teacher' => $teachers,
             'region' => $region,
             'venue' => Venue::toDropDown(),
             'field' => Course_Field::toDropDown(),
@@ -295,6 +326,31 @@ class CourseBreadController extends Controller
     {
         $rules = [];
 
+        if (isset($data->id)) {
+            $region_id = $data->region_id;
+            $check_function = 'update_concerning';
+        } else {
+            if (Auth::user()->can('create_global', Student::class)) {
+                $region_id = $request->input('region_id');
+            } else {
+                $region_id = User::getRegion();
+            }
+            $check_function = 'create_concerning';
+        }
+
+        if (Auth::user()->can($check_function, Course::class) && !User::isAdmin()) {
+            if (Auth::user()->supervisor->role->name == 'teacher') {
+                $teacher_id = Auth::user()->id;
+                $supervisor_id = $request->input('supervisor_id');
+            } else {
+                $teacher_id = $request->input('teacher_id');
+                $supervisor_id = Auth::user()->id;
+            }
+        } else {
+            $teacher_id = $request->input('teacher_id');
+            $supervisor_id = $request->input('supervisor_id');
+        }
+
         foreach ($rows as $row) {
             $options = json_decode($row->details);
             if (isset($options->rule)) {
@@ -316,22 +372,29 @@ class CourseBreadController extends Controller
 
         $this->validate($request, $rules);
 
+        $data->teacher_id = $teacher_id;
+        $data->supervisor_id = $supervisor_id;
+        $data->region_id = $region_id;
+
         DB::transaction(function () use ($data, $request) {
             $data->save();
 
             $course_id = $data->id;
             $students = $request->input('students_ids');
-            foreach ($students as $id) {
-                CourseUser::updateOrCreate(
-                    ['course_id' => $course_id, 'user_id' => $id,]
-                );
 
-                CourseUser::where('course_id', '=', $course_id)
-                    ->where('user_id', '=', $id)
-                    ->update([
-                        'status' => $request->input('students_grade')[$id][0],
-                        'grade' => $request->input('students_grade')[$id][1]
-                    ]);
+            if (isset($students)) {
+                foreach ($students as $id) {
+                    CourseUser::updateOrCreate(
+                        ['course_id' => $course_id, 'user_id' => $id,]
+                    );
+
+                    CourseUser::where('course_id', '=', $course_id)
+                        ->where('user_id', '=', $id)
+                        ->update([
+                            'status' => $request->input('students_grade')[$id][0],
+                            'grade' => $request->input('students_grade')[$id][1]
+                        ]);
+                }
             }
         });
 
@@ -465,6 +528,44 @@ class CourseBreadController extends Controller
         return Course::where('region_id', '=', $region_id)
             ->where('year', '=', date('Y'))
             ->max('sn') + 1;
+    }
+
+    public function getReport(Request $request)
+    {
+        $slug = $request->segment(2);
+
+        $dataType = DataType::where('slug', '=', $slug)->first();
+        $toReport = array();
+        $modelName = $dataType->model_name;
+        $dataTypeContent = $modelName::all();
+
+        //courses
+        foreach ($dataTypeContent as $data) {
+            $c = array();
+            foreach ($dataType->browseRows as $row) {
+                if ($row->type == 'select_dropdown') {
+                    $c[$row->display_name] = getNameById($row->field, $data->{$row->field});
+                } elseif ($row->field == 'sn') {
+                    $c[$row->display_name] = $data->{'year'} . '-' . $data->{$row->field};
+                } else {
+                    $c[$row->display_name] = $data->{$row->field};
+                }
+            }
+            $c['Number of Students'] = CourseUser::where('course_id', $data->id)->count();
+            $toReport[] = $c;
+        }
+
+        Excel::create($slug, function ($excel) use ($slug, $toReport) {
+
+            $excel->setTitle($slug);
+
+            $excel->sheet($slug, function ($sheet) use ($toReport) {
+                $sheet->setRightToLeft(true);
+                $sheet->fromArray($toReport);
+            });
+
+        })->download('xls');
+
     }
 }
 

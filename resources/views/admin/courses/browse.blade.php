@@ -1,7 +1,6 @@
 @extends('voyager::master')
 
 @section('page_header')
-    @can('create', \App\Models\Course::class)
     <h1 class="page-title">
         <i class="{{ $dataType->icon }}"></i> {{ $dataType->display_name_plural }}
         @can('create', \App\Models\Course::class)
@@ -9,8 +8,12 @@
             <i class="voyager-plus"></i> Add New
         </a>
         @endcan
+        @can('create', \App\Models\Course::class)
+        <a href="{{ route('admin.'.$dataType->slug.'.report') }}" class="btn btn-success">
+            <i class="voyager-plus"></i> Export
+        </a>
+        @endcan
     </h1>
-    @endcan
 @stop
 
 @section('page_header_actions')
@@ -52,11 +55,11 @@
                                         </td>
                                     @endforeach
                                     <td class="no-sort no-click">
-                                        @can('delete', $data)
-                                        <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
-                                             id="delete-{{ $data->id }}">
-                                            <i class="voyager-trash"></i> Delete
-                                        </div>
+                                        @can('view', $data)
+                                        <a href="{{ route($dataType->slug.'.show', $data->id) }}"
+                                           class="btn-sm btn-warning pull-right">
+                                            <i class="voyager-eye"></i> View
+                                        </a>
                                         @endcan
                                         @can('update', $data)
                                         <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
@@ -64,11 +67,11 @@
                                             <i class="voyager-edit"></i> Edit
                                         </a>
                                         @endcan
-                                        @can('view', $data)
-                                        <a href="{{ route($dataType->slug.'.show', $data->id) }}"
-                                           class="btn-sm btn-warning pull-right">
-                                            <i class="voyager-eye"></i> View
-                                        </a>
+                                        @can('delete', $data)
+                                        <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
+                                             id="delete-{{ $data->id }}">
+                                            <i class="voyager-trash"></i> Delete
+                                        </div>
                                         @endcan
                                     </td>
                                 </tr>

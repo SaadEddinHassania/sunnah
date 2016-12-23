@@ -18,7 +18,7 @@
 
 @section('page_header_actions')
 
-@stopindex.blade.php
+@stop
 
 @section('content')
     <div class="page-content container-fluid">
@@ -52,23 +52,23 @@
                                         </td>
                                     @endforeach
                                     <td class="no-sort no-click">
-                                        @can('delete', $data)
-                                        <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
-                                             id="delete-{{ $data->id }}">
-                                            <i class="voyager-trash"></i>
-                                        </div>
+                                        @can('view', $data)
+                                        <a href="{{ route($dataType->slug.'.show', $data->id) }}"
+                                           class="btn-sm btn-warning pull-right">
+                                            <i class="voyager-eye"></i> View
+                                        </a>
                                         @endcan
                                         @can('update', $data)
                                         <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
                                            class="btn-sm btn-primary pull-right edit">
-                                            <i class="voyager-edit"></i>
+                                            <i class="voyager-edit"></i> Edit
                                         </a>
                                         @endcan
-                                        @can('view', $data)
-                                        <a href="{{ route($dataType->slug.'.show', $data->id) }}"
-                                           class="btn-sm btn-warning pull-right">
-                                            <i class="voyager-eye"></i>
-                                        </a>
+                                        @can('delete', $data)
+                                        <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
+                                             id="delete-{{ $data->id }}">
+                                            <i class="voyager-trash"></i> Delete
+                                        </div>
                                         @endcan
                                     </td>
                                 </tr>

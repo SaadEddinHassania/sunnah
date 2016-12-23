@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
-    public function users()
+    public function supervisors()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(Supervisor::class);
     }
 
     public static function getName($id)

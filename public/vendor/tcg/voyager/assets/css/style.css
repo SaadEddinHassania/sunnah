@@ -1266,3 +1266,17 @@ a.text-action{color:#a3afb7}a.text-action,a.text-action:focus,a.text-action:hove
   padding-right: 5px!important;
   padding-left: 5px!important;
 }
+
+.side-menu::-webkit-scrollbar {
+  display: none;
+}
+
+/*td.no-sort.no-click {*/
+  /*text-align: right;*/
+/*}*/
+td.no-sort.no-click > * {
+  float: none !important;
+  display: inline-block;
+  margin: 0;
+  margin-bottom: 3px;
+}

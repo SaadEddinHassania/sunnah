@@ -11,6 +11,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use TCG\Voyager\Models\DataType;
 
 class SupervisorBreadController extends Controller
@@ -646,5 +647,43 @@ class SupervisorBreadController extends Controller
         return Student::join('users', 'students.user_id', 'users.id')
             ->where('region_id', '=', $region_id)
             ->pluck('students.user_id', 'users.name');
+    }
+
+    public function getReport(Request $request)
+    {
+        $slug = $request->segment(2);
+
+        $dataType = DataType::where('slug', '=', $slug)->first();
+        $toReport = array();
+        $modelName = $dataType->model_name;
+        $dataTypeContent = $modelName::all();
+
+        foreach ($dataTypeContent as $data) {
+            $c = array();
+            foreach ($dataType->browseRows as $row) {
+                if ($row->type == 'select_dropdown') {
+                    $c[$row->display_name] = getNameById($row->field, $data->{$row->field});
+                } elseif ($row->field == 'name') {
+                    $c[$row->display_name] = $data->user->name;
+                }elseif ($row->field == 'email') {
+                    $c[$row->display_name] = $data->user->email;
+                } else {
+                    $c[$row->display_name] = $data->{$row->field};
+                }
+            }
+            $toReport[] = $c;
+        }
+
+        Excel::create($slug, function ($excel) use ($slug, $toReport) {
+
+            $excel->setTitle($slug);
+
+            $excel->sheet($slug, function ($sheet) use ($toReport) {
+                $sheet->setRightToLeft(true);
+                $sheet->fromArray($toReport);
+            });
+
+        })->download('xls');
+
     }
 }

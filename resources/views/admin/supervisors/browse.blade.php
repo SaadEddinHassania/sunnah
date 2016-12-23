@@ -16,6 +16,11 @@
             </a>
             @endcan
         @endif
+        @can('create', \App\Models\Supervisor::class)
+        <a href="{{ route('admin.'.$dataType->slug.'.report') }}" class="btn btn-success">
+            <i class="voyager-plus"></i> Export
+        </a>
+        @endcan
     </h1>
 @stop
 
@@ -56,11 +61,11 @@
                                     @endforeach
                                     <td class="no-sort no-click">
                                         @if($dataType->slug == 'teachers')
-                                            @can('delete_teacher', $data)
-                                            <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
-                                                 id="delete-{{ $data->id }}">
-                                                <i class="voyager-trash"></i> Delete
-                                            </div>
+                                            @can('view_teacher', $data)
+                                            <a href="{{ route($dataType->slug.'.show', $data->id) }}"
+                                               class="btn-sm btn-warning pull-right">
+                                                <i class="voyager-eye"></i> View
+                                            </a>
                                             @endcan
                                             @can('update_teacher', $data)
                                             <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
@@ -68,18 +73,18 @@
                                                 <i class="voyager-edit"></i> Edit
                                             </a>
                                             @endcan
-                                            @can('view_teacher', $data)
-                                            <a href="{{ route($dataType->slug.'.show', $data->id) }}"
-                                               class="btn-sm btn-warning pull-right">
-                                                <i class="voyager-eye"></i> View
-                                            </a>
-                                            @endcan
-                                        @else
-                                            @can('delete', $data)
+                                            @can('delete_teacher', $data)
                                             <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
                                                  id="delete-{{ $data->id }}">
                                                 <i class="voyager-trash"></i> Delete
                                             </div>
+                                            @endcan
+                                        @else
+                                            @can('view', $data)
+                                            <a href="{{ route($dataType->slug.'.show', $data->id) }}"
+                                               class="btn-sm btn-warning pull-right">
+                                                <i class="voyager-eye"></i> View
+                                            </a>
                                             @endcan
                                             @can('update', $data)
                                             <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
@@ -87,11 +92,11 @@
                                                 <i class="voyager-edit"></i> Edit
                                             </a>
                                             @endcan
-                                            @can('view', $data)
-                                            <a href="{{ route($dataType->slug.'.show', $data->id) }}"
-                                               class="btn-sm btn-warning pull-right">
-                                                <i class="voyager-eye"></i> View
-                                            </a>
+                                            @can('delete', $data)
+                                            <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
+                                                 id="delete-{{ $data->id }}">
+                                                <i class="voyager-trash"></i> Delete
+                                            </div>
                                             @endcan
                                         @endif
                                     </td>

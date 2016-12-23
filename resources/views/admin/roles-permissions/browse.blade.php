@@ -51,11 +51,11 @@
                                         </td>
                                     @endforeach
                                     <td class="no-sort no-click">
-                                        {{--@can('delete', $data)--}}
-                                        <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
-                                             id="delete-{{ $data->id }}">
-                                            <i class="voyager-trash"></i> Delete
-                                        </div>
+                                        {{--@can('view', $data)--}}
+                                        <a href="{{ route($dataType->slug.'.show', $data->id) }}"
+                                           class="btn-sm btn-warning pull-right">
+                                            <i class="voyager-eye"></i> View
+                                        </a>
                                         {{--@endcan--}}
                                         {{--@can('update', $data)--}}
                                         <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
@@ -63,10 +63,12 @@
                                             <i class="voyager-edit"></i> Edit
                                         </a>
                                         {{--@endcan--}}
-                                        <a href="{{ route($dataType->slug.'.show', $data->id) }}"
-                                           class="btn-sm btn-warning pull-right">
-                                            <i class="voyager-eye"></i> View
-                                        </a>
+                                        {{--@can('delete', $data)--}}
+                                        <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
+                                             id="delete-{{ $data->id }}">
+                                            <i class="voyager-trash"></i> Delete
+                                        </div>
+                                        {{--@endcan--}}
                                     </td>
                                 </tr>
                             @endforeach

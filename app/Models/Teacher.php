@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Teacher extends Model
@@ -11,7 +12,6 @@ class Teacher extends Model
     public static function getName($id)
     {
         return Teacher::join('users', 'supervisors.user_id', 'users.id')
-            ->where('supervisors.role_id', '=', 3)
             ->where('users.id', '=', $id)
             ->select('users.name')
             ->first()
@@ -21,7 +21,14 @@ class Teacher extends Model
     public static function toDropDown()
     {
         return Supervisor::join('users', 'supervisors.user_id', 'users.id')
-            ->where('supervisors.role_id', '=', 3)
             ->pluck('users.name', 'users.id');
+    }
+
+    public function courses(){
+        return $this->hasMany(Course::class, 'user_id');
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

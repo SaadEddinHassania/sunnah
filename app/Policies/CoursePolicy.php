@@ -3,10 +3,12 @@
 namespace App\Policies;
 
 use App\Models\Course;
+use App\Models\Course_Type;
 use App\Models\Permission;
 use App\Models\Role_Permission;
 use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use TCG\Voyager\Models\Role;
 
 class CoursePolicy
 {
@@ -30,6 +32,9 @@ class CoursePolicy
             ->first();
 
         if ($global === null) {
+            if ($this->view_concerning($user)) {
+                return $course->supervisor_id == $user->id || $course->teacher_id == $user->id;
+            }
             return false;
         } elseif ($global) {
             return true;
@@ -53,7 +58,7 @@ class CoursePolicy
 
         return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
-            ->exists();
+            ->exists() || $this->create_concerning($user);
     }
 
     /**
@@ -73,6 +78,9 @@ class CoursePolicy
             ->first();
 
         if ($global === null) {
+            if ($this->update_concerning($user)) {
+                return $course->supervisor_id == $user->id || $course->teacher_id == $user->id;
+            }
             return false;
         } elseif ($global) {
             return true;
@@ -101,6 +109,9 @@ class CoursePolicy
             ->first();
 
         if ($global === null) {
+            if ($this->view_concerning($user)) {
+                return $course->supervisor_id == $user->id || $course->teacher_id == $user->id;
+            }
             return false;
         } elseif ($global) {
             return true;
@@ -137,6 +148,42 @@ class CoursePolicy
         return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId('view', class_basename(__CLASS__)))
             ->where('global', '=', 0)
+            ->exists();
+    }
+
+    public function view_concerning(User $user)
+    {
+        if (User::isAdmin()) return true;
+
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
+            ->exists();
+    }
+
+    public function create_concerning(User $user)
+    {
+        if (User::isAdmin()) return true;
+
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
+            ->exists();
+    }
+
+    public function update_concerning(User $user)
+    {
+        if (User::isAdmin()) return true;
+
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
+            ->exists();
+    }
+
+    public function delete_concerning(User $user)
+    {
+        if (User::isAdmin()) return true;
+        
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->exists();
     }
 

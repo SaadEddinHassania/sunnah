@@ -20,4 +20,8 @@ class Venue extends Model
     {
         return Venue::pluck('name', 'id');
     }
+
+    public function courses(){
+        return $this->hasMany(Course::class);
+    }
 }
