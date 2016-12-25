@@ -1280,3 +1280,9 @@ td.no-sort.no-click > * {
   margin: 0;
   margin-bottom: 3px;
 }
+
+.col-centered{
+  float: none;
+  margin: 0 auto;
+  margin-bottom: 0px !important;
+}

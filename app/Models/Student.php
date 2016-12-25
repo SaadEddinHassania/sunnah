@@ -8,34 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Student extends Model
 {
     protected $table = 'students';
-    
+
     public $timestamps = false;
 
-    protected $appends = array('المنطقة','الاسم','تاريخ الميلاد','رقم الجوال');
-
-    public function getالاسمAttribute()
+    public function user()
     {
-        return $this->user->name;
-    }
-
-    public function getالمنطقةAttribute()
-    {
-        return $this->region->name;
-    }
-    public function getتاريخالميلادAttribute()
-    {
-        return $this->dob;
-    }
-    public function getرقمالجوالAttribute()
-    {
-        return $this->mobile;
-    }
-
-    public function user(){
         return $this->belongsTo(User::class);
     }
 
-    public function region(){
+    public function region()
+    {
         return $this->belongsTo(Region::class);
     }
 
@@ -62,6 +44,7 @@ class Student extends Model
             ->where('course_user.course_id', '=', $course_id)
             ->select('users.name', 'students.user_id', 'course_user.status', 'course_user.grade')
             ->get();
+//        dd($dd->toArray());
 
         return $dd;
     }

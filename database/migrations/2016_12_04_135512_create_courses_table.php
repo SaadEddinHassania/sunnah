@@ -24,7 +24,6 @@ class CreateCoursesTable extends Migration
             $table->integer('venue_id')->unsigned()->index();
             $table->integer('field_id')->unsigned()->index();
             $table->integer('type_id')->unsigned()->index();
-            $table->string('grade')->default('0');
             $table->string('details')->nullable();
             $table->date('start_date')->nullable();
             $table->date('finish_date')->nullable();

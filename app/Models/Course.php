@@ -17,6 +17,28 @@ class Course extends Model
 {
     protected $table = 'courses';
 
+    protected $appends = ['rating'];
+
+    public function getRatingAttribute()
+    {
+        $tested = 3;
+        $attended = 2;
+        $type = $this->type_id;
+        $rating = 0;
+
+        $students = $this->users;
+        foreach ($students as $student) {
+            $status = CourseUser::whereCourse_id($this->id)->whereUser_id($student->id)->first()->status;
+            if ($status == 1) {
+                $rating += $type * $tested;
+            } elseif ($status == 2) {
+                $rating += $type * $attended;
+            }
+        }
+        return $rating;
+
+    }
+
     public function rows()
     {
         return $this->join('supervisor', 'supervisor.id', '=', 'courses.supervisor_id')
@@ -37,6 +59,11 @@ class Course extends Model
         return 'permission';
     }
 
+    public static function toDropDown()
+    {
+        return Course::pluck('name', 'id');
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class);
@@ -47,15 +74,18 @@ class Course extends Model
         return $this->belongsTo(Region::class);
     }
 
-    public function supervisor(){
+    public function supervisor()
+    {
         return $this->belongsTo(Supervisor::class, 'supervisor_id', 'user_id')->with('user');
     }
 
-    public function teacher(){
+    public function teacher()
+    {
         return $this->belongsTo(Teacher::class, 'teacher_id', 'user_id')->with('user');
     }
 
-    public function venue(){
+    public function venue()
+    {
         return $this->belongsTo(Venue::class);
     }
 

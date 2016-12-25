@@ -40,7 +40,7 @@ class StudentBreadController extends Controller
         if (Auth::user()->can('view_global', Student::class)) {
             $dataTypeContent = Student::join('users', 'users.id', 'user_id')
 //                ->where('users.is_deleted', '=', 0)
-                ->select('users.name', 'users.email', 'students.*')
+                ->select('users.name', 'users.email','users.created_at as c_at', 'students.*')
                 ->get();
         } elseif (Auth::user()->can('view_local', Student::class)) {
             $dataTypeContent = Student::where('region_id', '=', User::getRegion())
@@ -344,8 +344,19 @@ class StudentBreadController extends Controller
         DB::transaction(function () use ($data, $user_data, $region_id) {
             $user_data->save();
 
+            if (isset($data->user_id)) {
+                $sn = $data->sn;
+            } else {
+                $sn = Student::join('users', 'users.id', 'user_id')
+                        ->where('region_id', $region_id)
+                        ->whereYear('users.created_at', date('Y'))
+                        ->max('sn') + 1;
+            }
+
+            $data->sn = $sn;
             $data->user_id = $user_data->id;
             $data->region_id = $region_id;
+
             $data->save();
         });
 
@@ -513,7 +524,7 @@ class StudentBreadController extends Controller
                     $c[$row->display_name] = getNameById($row->field, $data->{$row->field});
                 } elseif ($row->field == 'name') {
                     $c[$row->display_name] = $data->user->name;
-                }elseif ($row->field == 'email') {
+                } elseif ($row->field == 'email') {
                     $c[$row->display_name] = $data->user->email;
                 } else {
                     $c[$row->display_name] = $data->{$row->field};

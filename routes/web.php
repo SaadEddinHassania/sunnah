@@ -36,8 +36,15 @@ Route::get('admin/coursesRY/{region_id}', 'CourseBreadController@getSNByRegion')
 Route::group(['middleware' => ['web', 'admin.user'], 'prefix' => 'admin'], function () {
 
     Route::get('students/report', 'StudentBreadController@getReport')->name('admin.students.report');
-    Route::get('courses/report', 'CourseBreadController@getReport')->name('admin.courses.report');
+    Route::post('courses/report-all', 'CourseBreadController@reportCourses')->name('admin.courses.all_report');
     Route::get('supervisors/report', 'SupervisorBreadController@getReport')->name('admin.supervisors.report');
+    Route::post('courses/course-report/', 'CourseBreadController@getCourseReport')->name('admin.courses.c_report');
+    Route::post('courses/reports/date/', 'CourseBreadController@reportCoursesByDate')->name('admin.courses.d_report');
+    Route::get('courses/reports/', function(){
+        return view('admin.courses.reports');
+    });
+
+    Route::post('courses/reports/','CourseBreadController@reports')->name('admin.courses.reports');;
 
 
     if (env('DB_CONNECTION') !== null && Schema::hasTable('data_types')):

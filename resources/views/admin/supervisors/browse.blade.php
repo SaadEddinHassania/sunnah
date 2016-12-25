@@ -17,7 +17,7 @@
             @endcan
         @endif
         @can('create', \App\Models\Supervisor::class)
-        <a href="{{ route('admin.'.$dataType->slug.'.report') }}" class="btn btn-success">
+        <a href="{{ route('admin.supervisors.report') }}" class="btn btn-success">
             <i class="voyager-plus"></i> Export
         </a>
         @endcan

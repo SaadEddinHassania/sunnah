@@ -142,7 +142,7 @@ class CourseBreadController extends Controller
             'venue' => Venue::toDropDown(),
             'field' => Course_Field::toDropDown(),
             'type' => Course_Type::toDropDown(),
-            'students' => Student::getStudentsByCourse($dataTypeContent->id)
+            'students' => Student::getStudentsByCourse($dataTypeContent->id)->toArray()
         );
         $options_ = json_encode($options_);
 
@@ -205,7 +205,10 @@ class CourseBreadController extends Controller
             $region = [getNameById('region', User::getRegion())];
         }
 
-        if (Auth::user()->can('create_concerning', Course::class)) {
+        if (User::isAdmin() || !Auth::user()->can('create_concerning', Course::class)) {
+            $teachers = Teacher::toDropDown();
+            $supervisors = Supervisor::toDropDown();
+        } elseif (Auth::user()->can('create_concerning', Course::class)) {
             if (Auth::user()->supervisor->role->name == 'teacher') {
                 $teachers = [Auth::user()->name];
                 $supervisors = Supervisor::toDropDown();
@@ -213,9 +216,6 @@ class CourseBreadController extends Controller
                 $teachers = Teacher::toDropDown();
                 $supervisors = [Auth::user()->name];
             }
-        } else {
-            $teachers = Teacher::toDropDown();
-            $supervisors = Supervisor::toDropDown();
         }
 
         $options_ = array(
@@ -524,13 +524,12 @@ class CourseBreadController extends Controller
 
     public function getSNByRegion($region_id)
     {
-        error_log("reg id= " . $region_id);
         return Course::where('region_id', '=', $region_id)
             ->where('year', '=', date('Y'))
             ->max('sn') + 1;
     }
 
-    public function getReport(Request $request)
+    public function reportCourses(Request $request)
     {
         $slug = $request->segment(2);
 
@@ -558,14 +557,207 @@ class CourseBreadController extends Controller
         Excel::create($slug, function ($excel) use ($slug, $toReport) {
 
             $excel->setTitle($slug);
+            $excel->getDefaultStyle()
+                ->getAlignment()
+                ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
             $excel->sheet($slug, function ($sheet) use ($toReport) {
                 $sheet->setRightToLeft(true);
+                $sheet->freezeFirstRow();
+                $sheet->setAutoSize(true);
+                $sheet->setHeight(1, 20);
                 $sheet->fromArray($toReport);
             });
 
         })->download('xls');
+    }
 
+    public function getCourseReport(Request $request)
+    {
+        $slug = $request->segment(2);
+        $id = $request->input('id');
+
+        $dataType = DataType::where('slug', '=', $slug)->first();
+        $course = array();
+        $modelName = $dataType->model_name;
+        $data = $modelName::find($id);
+
+        $c = array();
+        foreach ($dataType->browseRows as $row) {
+            if ($row->type == 'select_dropdown') {
+                $c[$row->display_name] = getNameById($row->field, $data->{$row->field});
+            } elseif ($row->field == 'sn') {
+                $c[$row->display_name] = $data->{'year'} . '-' . $data->{$row->field};
+            } else {
+                $c[$row->display_name] = $data->{$row->field};
+            }
+        }
+        $c['Number of Students'] = $data->users->count();
+        $course[] = $c;
+
+        $students = array();
+
+        foreach ($data->users as $student) {
+            $s = array();
+            $d = CourseUser::whereCourse_id($data->id)->whereUser_id($student->id)->first();
+            $status = $d->status;
+            $grade = $d->grade;
+            if ($status == 1) {
+                $status = 'اختبر';
+            } elseif ($status == 2) {
+                $status = 'شارك';
+            } elseif ($status == 3) {
+                $status = 'لم يشارك';
+            } else {
+                $status = '';
+            }
+            $s['الاسم'] = $student->name;
+            $s['حالة الطالب'] = $status;
+            $s['علامة الطالب'] = $grade;
+            $students[] = $s;
+        }
+//        dd($students);
+
+        Excel::create($course[0]['name'], function ($excel) use ($course, $students) {
+
+            $excel->setTitle($course[0]['name']);
+            $excel->getDefaultStyle()
+                ->getAlignment()
+                ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+            $excel->sheet($course[0]['name'], function ($sheet) use ($course, $students) {
+                $sheet->setRightToLeft(true);
+//                $sheet->freezeFirstRow();
+                $sheet->fromArray($course);
+                $sheet->setHeight(1, 20);
+
+                $sheet->row(3, array('الطﻻب'));
+//                $sheet->cells('A3:C3', function ($cells) {
+//                    $cells->setBorder('thin', 'thin', 'thin', 'thin');
+//                });
+                $sheet->mergeCells('A3:C3');
+                $sheet->getStyle('A3:C3')->getAlignment()->applyFromArray(
+                    array('horizontal' => 'center')
+                );
+
+                $sheet->appendRow(array_keys($students[0]));
+                $sheet->setHeight(4, 20);
+                $sheet->setFreeze('A5');
+                $sheet->rows($students);
+            });
+
+        })->download('xls');
+    }
+
+    public function reports(Request $request)
+    {
+        $col = $request->input('col');
+        $value = $request->input('value');
+
+        $slug = $request->segment(2);
+
+        $dataType = DataType::where('slug', '=', $slug)->first();
+        $courses = array();
+        $modelName = $dataType->model_name;
+        $dataTypeContent = $modelName::where($col, $value)->get();
+
+        if (count($dataTypeContent) == 0) {
+            return redirect('admin/courses/reports')
+                ->with([
+                    'message' => "You don't have Course with this Option",
+                    'alert-type' => 'error',
+                ]);
+        }
+
+        foreach ($dataTypeContent as $data) {
+            $c = array();
+            foreach ($dataType->browseRows as $row) {
+                if ($row->type == 'select_dropdown') {
+                    $c[$row->display_name] = getNameById($row->field, $data->{$row->field});
+                } elseif ($row->field == 'sn') {
+                    $c[$row->display_name] = $data->{'year'} . '-' . $data->{$row->field};
+                } else {
+                    $c[$row->display_name] = $data->{$row->field};
+                }
+            }
+            $c['Number of Students'] = $data->users->count();
+            $courses[] = $c;
+        }
+
+        Excel::create($slug, function ($excel) use ($slug, $courses) {
+
+            $excel->setTitle($slug);
+            $excel->getDefaultStyle()
+                ->getAlignment()
+                ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+            $excel->sheet($slug , function ($sheet) use ($courses) {
+                $sheet->setRightToLeft(true);
+                $sheet->freezeFirstRow();
+                $sheet->setHeight(1, 20);
+                $sheet->fromArray($courses);
+            });
+
+        })->download('xls');
+    }
+
+    public function reportCoursesByDate(Request $request)
+    {
+        $from = $request->input('from');
+        $to = $request->input('to');
+        $value = $request->input('value');
+
+        $slug = $request->segment(2);
+
+        $dataType = DataType::where('slug', '=', $slug)->first();
+        $courses = array();
+        $modelName = $dataType->model_name;
+        $dataTypeContent = $modelName::whereBetween('start_date', [$from, $to])->get();
+
+//        dd(count($dataTypeContent));
+
+        if (count($dataTypeContent) == 0) {
+            return redirect('admin/courses/reports')
+                ->with([
+                    'message' => "You don't have Course between this Date",
+                    'alert-type' => 'error',
+                ]);
+        }
+
+        foreach ($dataTypeContent as $data) {
+            $c = array();
+            foreach ($dataType->browseRows as $row) {
+                if ($row->type == 'select_dropdown') {
+                    $c[$row->display_name] = getNameById($row->field, $data->{$row->field});
+                } elseif ($row->field == 'sn') {
+                    $c[$row->display_name] = $data->{'year'} . '-' . $data->{$row->field};
+                } else {
+                    $c[$row->display_name] = $data->{$row->field};
+                }
+            }
+            $c['Number of Students'] = $data->users->count();
+            $courses[] = $c;
+        }
+
+        Excel::create($slug, function ($excel) use ($slug, $courses) {
+
+            $excel->setTitle($slug);
+            $excel->getDefaultStyle()
+                ->getAlignment()
+                ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+            $excel->sheet($slug , function ($sheet) use ($courses) {
+                $sheet->setRightToLeft(true);
+                $sheet->freezeFirstRow();
+                $sheet->setHeight(1, 20);
+                $sheet->fromArray($courses);
+            });
+
+        })->download('xls');
     }
 }
 

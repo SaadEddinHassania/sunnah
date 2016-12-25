@@ -9,8 +9,8 @@
         </a>
         @endcan
         @can('create', \App\Models\Course::class)
-        <a href="{{ route('admin.'.$dataType->slug.'.report') }}" class="btn btn-success">
-            <i class="voyager-plus"></i> Export
+        <a href="courses/reports" class="btn btn-success">
+            <i class="voyager-plus"></i> Reports
         </a>
         @endcan
     </h1>

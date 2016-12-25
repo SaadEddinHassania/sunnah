@@ -203,11 +203,11 @@
                                                                     </option>
                                                                     <option value='2'
                                                                             @if($s->status == 2)selected="selected"@endif>
-                                                                        attended
+                                                                        Attended
                                                                     </option>
                                                                     <option value='3'
                                                                             @if($s->status == 3)selected="selected"@endif>
-                                                                        not attend
+                                                                        Not Attend
                                                                     </option>
 
                                                                 </select>
@@ -284,26 +284,11 @@
                         hidden: true
                     }]
             });
-            $('select[val="-1"]').select2("val", "");
+
+            setDropDown($('select[val="-1"]'));
             getStudentByRegion({{$region_id}});
             @else
-                $('select').select2({
-                theme: "bootstrap",
-                placeholder: {
-                    id: "-1",
-                    text: "Select an option",
-                    selected: 'selected'
-                },
-                allowClear: true,
-                data: [
-                    {
-                        id: -1,
-                        text: '',
-                        selected: 'selected',
-                        search: '',
-                        hidden: true
-                    }]
-            });
+                setDropDown($('select'));
             @endif
         });
 

@@ -47,7 +47,11 @@
                                             @elseif($row->type == 'select_dropdown')
                                                 {{ getNameById($row->field, $data->{$row->field}) }}
                                             @else
-                                                {{ $data->{$row->field} }}
+                                                @if($row->field == 'sn')
+                                                    {{date_parse($data->{'c_at'})['year'].'-'.$data->{$row->field} }}
+                                                @else
+                                                    {{ $data->{$row->field} }}
+                                                @endif
                                             @endif
                                         </td>
                                     @endforeach

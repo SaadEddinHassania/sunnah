@@ -38,7 +38,11 @@ class PermissionsTableSeeder extends Seeder
                 array('id' => '21', 'display_name' => 'Manage Courses Types', 'func_name' => 'courses-types', 'policy_name' => 'Courses_TypePolicy', 'created_at' => '2016-12-14 14:25:30', 'updated_at' => '2016-12-14 14:25:30'),
                 array('id' => '22', 'display_name' => 'Manage Regions', 'func_name' => 'regions', 'policy_name' => 'RegionPolicy', 'created_at' => '2016-12-14 14:27:12', 'updated_at' => '2016-12-14 14:27:12'),
                 array('id' => '23', 'display_name' => 'Manage Permissions', 'func_name' => 'roles_permissions', 'policy_name' => 'RolePermissionsPolicy', 'created_at' => '2016-12-14 16:34:23', 'updated_at' => '2016-12-14 16:34:23'),
-                array('id' => '24', 'display_name' => 'Manage Venues', 'func_name' => 'venues', 'policy_name' => 'VenuesPolicy', 'created_at' => '2016-12-14 17:12:47', 'updated_at' => '2016-12-14 17:12:47')
+                array('id' => '24', 'display_name' => 'Manage Venues', 'func_name' => 'venues', 'policy_name' => 'VenuesPolicy', 'created_at' => '2016-12-14 17:12:47', 'updated_at' => '2016-12-14 17:12:47'),
+                array('id' => '25', 'display_name' => 'View Courses Only concerning him', 'func_name' => 'view_concerning', 'policy_name' => 'CoursePolicy', 'created_at' => '2016-12-20 20:35:11', 'updated_at' => '2016-12-20 20:35:11'),
+                array('id' => '26', 'display_name' => 'Update Courses Only concerning him', 'func_name' => 'update_concerning', 'policy_name' => 'CoursePolicy', 'created_at' => '2016-12-20 20:35:25', 'updated_at' => '2016-12-20 20:35:25'),
+                array('id' => '27', 'display_name' => 'Create Courses Only concerning him', 'func_name' => 'create_concerning', 'policy_name' => 'CoursePolicy', 'created_at' => '2016-12-20 20:35:37', 'updated_at' => '2016-12-20 20:35:37'),
+                array('id' => '28', 'display_name' => 'Delete Courses Only concerning him', 'func_name' => 'delete_concerning', 'policy_name' => 'CoursePolicy', 'created_at' => '2016-12-20 20:35:51', 'updated_at' => '2016-12-20 20:35:51')
             )
         );
     }
