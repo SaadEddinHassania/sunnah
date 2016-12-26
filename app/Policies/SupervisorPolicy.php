@@ -247,4 +247,20 @@ class SupervisorPolicy
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->exists();
     }
+
+    public function index(User $user){
+        if (User::isAdmin()) return true;
+
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId('view', class_basename(__CLASS__)))
+            ->exists();
+    }
+
+    public function index_teacher(User $user){
+        if (User::isAdmin()) return true;
+
+        return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId('view_teacher', class_basename(__CLASS__)))
+            ->exists();
+    }
 }

@@ -1286,3 +1286,8 @@ td.no-sort.no-click > * {
   margin: 0 auto;
   margin-bottom: 0px !important;
 }
+
+.flat-blue .btn.btn-danger {
+  background-color: #c9302c !important;
+  border-color: #c9302c !important;
+}

@@ -13,4 +13,8 @@ class SettingPolicy
     {
         if (User::isAdmin()) return true;
     }
+
+    public function index(User $user){
+        if (User::isAdmin()) return true;
+    }
 }

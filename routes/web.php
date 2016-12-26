@@ -44,6 +44,10 @@ Route::group(['middleware' => ['web', 'admin.user'], 'prefix' => 'admin'], funct
         return view('admin.courses.reports');
     });
 
+    Route::get('roles_p', function(){
+        return view('admin.roles-permissions.index');
+    });
+
     Route::post('courses/reports/','CourseBreadController@reports')->name('admin.courses.reports');;
 
 

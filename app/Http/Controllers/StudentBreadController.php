@@ -46,7 +46,7 @@ class StudentBreadController extends Controller
             $dataTypeContent = Student::where('region_id', '=', User::getRegion())
                 ->join('users', 'users.id', 'user_id')
                 ->where('users.is_deleted', '=', 0)
-                ->select('users.name', 'users.email', 'students.*')
+                ->select('users.name', 'users.email','users.created_at as c_at', 'students.*')
                 ->get();
         } else {
             return redirect('admin')

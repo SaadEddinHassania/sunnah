@@ -29,6 +29,14 @@ class Permission extends Model
             ->first()
             ->id;
     }
+    
+    public static function toDropDownDis(){
+        return Permission::select('policy_name')->distinct()->get();
+    }
+
+    public function permissionsByPolicy($policy_name){
+        return Permission::where('policy_name', $policy_name)->get();
+    }
 
 
 }
