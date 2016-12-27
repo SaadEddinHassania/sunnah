@@ -35,20 +35,30 @@ Route::get('admin/coursesRY/{region_id}', 'CourseBreadController@getSNByRegion')
 
 Route::group(['middleware' => ['web', 'admin.user'], 'prefix' => 'admin'], function () {
 
-    Route::get('students/report', 'StudentBreadController@getReport')->name('admin.students.report');
     Route::post('courses/report-all', 'CourseBreadController@reportCourses')->name('admin.courses.all_report');
     Route::get('supervisors/report', 'SupervisorBreadController@getReport')->name('admin.supervisors.report');
     Route::post('courses/course-report/', 'CourseBreadController@getCourseReport')->name('admin.courses.c_report');
     Route::post('courses/reports/date/', 'CourseBreadController@reportCoursesByDate')->name('admin.courses.d_report');
+
     Route::get('courses/reports/', function(){
         return view('admin.courses.reports');
-    });
+    })->middleware('can:reports');
+
+    Route::get('students/reports/', function(){
+        return view('admin.students.reports');
+    })->middleware('can:reports');
+
+    Route::get('supervisors/reports/', function(){
+        return view('admin.supervisors.reports');
+    })->middleware('can:reports');
 
     Route::get('roles_p', function(){
         return view('admin.roles-permissions.index');
     });
 
     Route::post('courses/reports/','CourseBreadController@reports')->name('admin.courses.reports');;
+    Route::post('students/reports/','StudentBreadController@reports')->name('admin.students.reports');;
+    Route::post('supervisors/reports/','SupervisorBreadController@reports')->name('admin.supervisors.reports');;
 
 
     if (env('DB_CONNECTION') !== null && Schema::hasTable('data_types')):

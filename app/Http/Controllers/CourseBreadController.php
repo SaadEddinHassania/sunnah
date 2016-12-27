@@ -15,6 +15,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Constraint;
@@ -173,7 +174,7 @@ class CourseBreadController extends Controller
         return redirect()
             ->route("{$dataType->slug}.index")
             ->with([
-                'message' => "Successfully Updated {$dataType->display_name_singular}",
+                'message' => "تم تعديل الدورة بنجاح",
                 'alert-type' => 'success',
             ]);
     }
@@ -260,7 +261,7 @@ class CourseBreadController extends Controller
         return redirect()
             ->route("{$dataType->slug}.index")
             ->with([
-                'message' => "Successfully Added New {$dataType->display_name_singular}",
+                'message' => "تم اضافة الدورة بنجاح",
                 'alert-type' => 'success',
             ]);
     }
@@ -310,11 +311,11 @@ class CourseBreadController extends Controller
 
         $data = $data->destroy($id)
             ? [
-                'message' => "Successfully Deleted {$dataType->display_name_singular}",
+                'message' => "تم حذف الدورة بنجاح",
                 'alert-type' => 'success',
             ]
             : [
-                'message' => "Sorry it appears there was a problem deleting this {$dataType->display_name_singular}",
+                'message' => "نأسف حدثت بعض المشاكل في حذف هذه الدورة",
                 'alert-type' => 'error',
             ];
 
@@ -391,8 +392,8 @@ class CourseBreadController extends Controller
                     CourseUser::where('course_id', '=', $course_id)
                         ->where('user_id', '=', $id)
                         ->update([
-                            'status' => $request->input('students_grade')[$id][0],
-                            'grade' => $request->input('students_grade')[$id][1]
+                            'status' => $request->input('students_grade')[$id][1],
+                            'grade' => $request->input('students_grade')[$id][0]
                         ]);
                 }
             }
@@ -531,6 +532,13 @@ class CourseBreadController extends Controller
 
     public function reportCourses(Request $request)
     {
+        if (Gate::denies('reports')) {
+            return redirect('admin')->with([
+                'message' => "نأسف لا تمتلك صلاحيات",
+                'alert-type' => 'error',
+            ]);
+        }
+
         $slug = $request->segment(2);
 
         $dataType = DataType::where('slug', '=', $slug)->first();
@@ -575,6 +583,13 @@ class CourseBreadController extends Controller
 
     public function getCourseReport(Request $request)
     {
+        if (Gate::denies('reports')) {
+            return redirect('admin')->with([
+                'message' => "نأسف لا تمتلك صلاحيات",
+                'alert-type' => 'error',
+            ]);
+        }
+
         $slug = $request->segment(2);
         $id = $request->input('id');
 
@@ -653,6 +668,13 @@ class CourseBreadController extends Controller
 
     public function reports(Request $request)
     {
+        if (Gate::denies('reports')) {
+            return redirect('admin')->with([
+                'message' => "نأسف لا تمتلك صلاحيات",
+                'alert-type' => 'error',
+            ]);
+        }
+
         $col = $request->input('col');
         $value = $request->input('value');
 
@@ -666,8 +688,8 @@ class CourseBreadController extends Controller
         if (count($dataTypeContent) == 0) {
             return redirect('admin/courses/reports')
                 ->with([
-                    'message' => "You don't have Course with this Option",
-                    'alert-type' => 'error',
+                    'message' => "ليس لديك دورات مع هذه الخيارات",
+                    'alert-type' => 'info',
                 ]);
         }
 
@@ -706,9 +728,15 @@ class CourseBreadController extends Controller
 
     public function reportCoursesByDate(Request $request)
     {
+        if (Gate::denies('reports')) {
+            return redirect('admin')->with([
+                'message' => "نأسف ليس لديك صلاحيات",
+                'alert-type' => 'error',
+            ]);
+        }
+
         $from = $request->input('from');
         $to = $request->input('to');
-        $value = $request->input('value');
 
         $slug = $request->segment(2);
 
@@ -722,7 +750,7 @@ class CourseBreadController extends Controller
         if (count($dataTypeContent) == 0) {
             return redirect('admin/courses/reports')
                 ->with([
-                    'message' => "You don't have Course between this Date",
+                    'message' => "لا يوجد دورات بين هذين التاريخين",
                     'alert-type' => 'error',
                 ]);
         }

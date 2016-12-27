@@ -32,7 +32,6 @@ class Roles_PermissionsSeeder extends Seeder
                 array('id' => '18', 'role_id' => '4', 'permission_id' => '3', 'global' => '0'),
                 array('id' => '20', 'role_id' => '4', 'permission_id' => '6', 'global' => '0'),
                 array('id' => '21', 'role_id' => '4', 'permission_id' => '11', 'global' => '0'),
-                array('id' => '22', 'role_id' => '4', 'permission_id' => '14', 'global' => '0'),
                 array('id' => '23', 'role_id' => '4', 'permission_id' => '5', 'global' => '0'),
                 array('id' => '25', 'role_id' => '1', 'permission_id' => '23', 'global' => '0'),
                 array('id' => '26', 'role_id' => '1', 'permission_id' => '14', 'global' => '1'),
@@ -57,7 +56,14 @@ class Roles_PermissionsSeeder extends Seeder
                 array('id' => '45', 'role_id' => '4', 'permission_id' => '7', 'global' => '0'),
                 array('id' => '46', 'role_id' => '4', 'permission_id' => '15', 'global' => '0'),
                 array('id' => '47', 'role_id' => '4', 'permission_id' => '16', 'global' => '0'),
-                array('id' => '48', 'role_id' => '4', 'permission_id' => '17', 'global' => '0')
+                array('id' => '48', 'role_id' => '4', 'permission_id' => '17', 'global' => '0'),
+                array('id' => '49', 'role_id' => '4', 'permission_id' => '27', 'global' => '0'),
+                array('id' => '50', 'role_id' => '3', 'permission_id' => '27', 'global' => '0'),
+                array('id' => '51', 'role_id' => '4', 'permission_id' => '25', 'global' => '0'),
+                array('id' => '52', 'role_id' => '5', 'permission_id' => '5', 'global' => '0'),
+                array('id' => '53', 'role_id' => '5', 'permission_id' => '14', 'global' => '0'),
+                array('id' => '54', 'role_id' => '4', 'permission_id' => '5', 'global' => '0'),
+                array('id' => '55', 'role_id' => '4', 'permission_id' => '14', 'global' => '0')
             )
         );
     }

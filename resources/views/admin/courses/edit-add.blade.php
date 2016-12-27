@@ -7,7 +7,7 @@
 
 @section('page_header')
     <h1 class="page-title">
-        <i class="{{ $dataType->icon }}"></i> @if(isset($dataTypeContent->id)){{ 'Edit' }}@else{{ 'New' }}@endif {{ $dataType->display_name_singular }}
+        <i class="{{ $dataType->icon }}"></i>{{ $dataType->display_name_singular }} @if(isset($dataTypeContent->id)){{ 'تعديل' }}@else{{ 'جديد/ة' }}@endif
     </h1>
 @stop
 <?php $region_id = 0;?>
@@ -23,7 +23,9 @@
                       method="POST" enctype="multipart/form-data">
 
                     <div class="row">
-                        <div class="col-md-7">
+
+                        {{--Course--}}
+                        <div class="col-md-7 pull-right">
                             <div class="panel panel-body panel-bordered">
 
                                 @if (count($errors) > 0)
@@ -154,10 +156,12 @@
 
                             </div><!-- panel-body -->
                         </div>
+
+                        {{--students--}}
                         <div class="col-md-5">
                             <div class="panel panel panel-bordered panel-info">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title"><i class="icon wb-clipboard"></i> Add Students</h3>
+                                    <h3 class="panel-title"><i class="icon wb-clipboard"></i> الطلاب</h3>
                                     <div class="panel-actions">
                                         <a class="panel-action icon wb-minus" data-toggle="panel-collapse"
                                            aria-hidden="true"></a>
@@ -172,9 +176,9 @@
                                         <table class="table table-hover">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">Name</th>
-                                                <th class="text-center">Status</th>
-                                                <th class="text-center">Grade</th>
+                                                <th class="text-center">الاسم</th>
+                                                <th class="text-center">الحالة</th>
+                                                <th class="text-center">العلامة</th>
                                             </tr>
                                             </thead>
                                         </table>
@@ -189,13 +193,19 @@
                                                         <input type='hidden' name='students_ids[]'
                                                                value='{{$s->user_id}}'/>
                                                         <div class='row'>
+
                                                             <div class='col-xs-4 group-student'>
-                                                                <label class='form-control'>{{$s->name}}</label>
+                                                                <input class='form-control' type='number'
+                                                                       min="0" max="100"
+                                                                       name='students_grade[{{$s->user_id}}][]'
+                                                                       value="{{$s->grade}}"
+                                                                       placeholder='grade'/>
                                                             </div>
+
                                                             <div class='col-xs-4 group-student'>
                                                                 <select class='form-control'
-                                                                        val = {{$s->status}}
-                                                                        name='students_grade[{{$s->user_id}}][]'>
+                                                                        val={{$s->status}}
+                                                                                name='students_grade[{{$s->user_id}}][]'>
 
                                                                     <option value='1'
                                                                             @if($s->status == 1)selected="selected"@endif>
@@ -212,12 +222,9 @@
 
                                                                 </select>
                                                             </div>
+
                                                             <div class='col-xs-4 group-student'>
-                                                                <input class='form-control' type='number'
-                                                                       min="0" max="100"
-                                                                       name='students_grade[{{$s->user_id}}][]'
-                                                                       value="{{$s->grade}}"
-                                                                       placeholder='grade'/>
+                                                                <label class='form-control'>{{$s->name}}</label>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -303,7 +310,7 @@
                     "<input type='hidden' name='students_ids[]' value='" + add_student.val() + "'/>" +
                     "<div class='row'>" +
                     "<div class='col-xs-4 group-student'>" +
-                    "<label class='form-control'>" + this.options[this.selectedIndex].text + "</label></div>" +
+                    "<input class='form-control' type='number' min='0' max='100' value='0' name='students_grade[" + add_student.val() + "][]' placeholder='grade'/></div>" +
                     "<div class='col-xs-4 group-student'>" +
                     "<select class='form-control students_grade" + add_student.val() + "' name='students_grade[" + add_student.val() + "][]'>" +
                     "<option value='1'>Tested</option>" +
@@ -311,8 +318,8 @@
                     "<option value='3'>not attend</option>" +
                     "</select></div>" +
                     "<div class='col-xs-4 group-student'>" +
-                    "<input class='form-control' type='number' min='0' max='100' value='0' name='students_grade[" + add_student.val() + "][]' placeholder='grade'/>" +
-                    "</div></div></li>");
+                    "<label class='form-control'>" + this.options[this.selectedIndex].text + "</label></div>" +
+                    "</div></li>");
             setDropDown($('.students_grade' + add_student.val()));
             add_student.val(-1);
         });

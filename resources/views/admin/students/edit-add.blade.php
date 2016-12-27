@@ -7,7 +7,7 @@
 
 @section('page_header')
     <h1 class="page-title">
-        <i class="{{ $dataType->icon }}"></i> @if(isset($dataTypeContent->id)){{ 'Edit' }}@else{{ 'New' }}@endif {{ $dataType->display_name_singular }}
+        <i class="{{ $dataType->icon }}"></i>{{ $dataType->display_name_singular }} @if(isset($dataTypeContent->id)){{ 'تعديل' }}@else{{ 'جديد' }}@endif
     </h1>
 @stop
 
@@ -19,7 +19,7 @@
                 <div class="panel panel-bordered">
 
                     <div class="panel-heading">
-                        <h3 class="panel-title">@if(isset($dataTypeContent->id)){{ 'Edit' }}@else{{ 'Add New' }}@endif {{ $dataType->display_name_singular }}</h3>
+                        <h3 class="panel-title">@if(isset($dataTypeContent->id)){{ 'تعديل' }}@else{{ 'إضافة' }}@endif {{ $dataType->display_name_singular }}</h3>
                     </div>
                     <!-- /.box-header -->
                     <!-- form start -->

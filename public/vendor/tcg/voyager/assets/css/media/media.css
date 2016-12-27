@@ -168,11 +168,11 @@
 }
 
 .breadcrumb-container .toggle{
-	float: right;
+	float: left;
     position: absolute;
     top: 11px;
     cursor: pointer;
-    right: 5px;
+    left: 5px;
     color: #bbb;
     transition: color 0.1s linear;
     overflow:visible;
@@ -186,16 +186,16 @@
 	
 	font-size:9px;
 	text-transform: uppercase;
-	float:left;
+	float:right;
 	top:2px;
 	position:relative;
 	font-weight:bold;
-	right:10px;
+	left:10px;
 }
 .breadcrumb-container .toggle i{
 	font-size:18px;
-	float:right;
-	margin-right:5px;
+	float:left;
+	margin-left:5px;
 	position:relative;
 	top:-4px;
 }
@@ -452,18 +452,18 @@
 }
 
 .detail_info h4{
-	float:left;
+	float:right;
 	color:#bbb;
 	margin:0px;
 	font-size:12px;
 	margin-top:3px;
-	margin-right:8px;
+	margin-left:8px;
 	padding-bottom:2px;
 	font-weight:400;
 }
 
 .detail_info p{
-	float:left;
+	float:right;
 	color:#444;
 	padding-bottom:3px;
 	font-size:12px;

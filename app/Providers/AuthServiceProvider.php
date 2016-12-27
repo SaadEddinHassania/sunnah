@@ -17,6 +17,7 @@ use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Request;
 use TCG\Voyager\Models\Setting;
 
 class AuthServiceProvider extends ServiceProvider
@@ -54,7 +55,7 @@ class AuthServiceProvider extends ServiceProvider
         );
 
         Gate::define('roles', function () {
-            return Auth::user()->isAdmin();
+            return Auth::user()->hasPermission('roles');
         });
 
         Gate::define('permissions', function () {
@@ -65,8 +66,8 @@ class AuthServiceProvider extends ServiceProvider
             return Auth::user()->isAdmin();
         });
 
-        Gate::define('users', function () {
-            return Auth::user()->isAdmin();
+        Gate::define('users', function (User $user) {
+            return Auth::user()->isAdmin() || Request::segment(3) == $user->id;
         });
 
         Gate::define('database', function () {
@@ -95,6 +96,10 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('venues', function () {
             return User::hasPermission('venues');
+        });
+
+        Gate::define('reports', function () {
+            return User::hasPermission('reports');
         });
     }
 }

@@ -6,7 +6,7 @@
         <i class="{{ $dataType->icon }}"></i> {{ $dataType->display_name_plural }}
         @can('roles_permissions', \App\Models\Role_Permission::class)
         <a href="{{ route($dataType->slug.'.create') }}" class="btn btn-success">
-            <i class="voyager-plus"></i> Add New
+            <i class="voyager-plus"></i> إضافة جديد
         </a>
         @endcan
     </h1>
@@ -29,7 +29,7 @@
                                 @foreach($dataType->browseRows as $rows)
                                     <th>{{ $rows->display_name }}</th>
                                 @endforeach
-                                <th class="actions">Actions</th>
+                                <th class="actions">الاجراءات</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -37,7 +37,7 @@
                                 <tr>
                                     @foreach($dataType->browseRows as $row)
                                         <td>
-                                            @if($row->type == 'PRI')
+                                            @if($row->type == 'select_dropdown')
                                                 {{ getNameById($row->field, $data->{$row->field}) }}
                                             @elseif($row->type == 'checkbox')
                                                 @if($data->{$row->field} == 1)
@@ -54,19 +54,19 @@
                                         {{--@can('view', $data)--}}
                                         <a href="{{ route($dataType->slug.'.show', $data->id) }}"
                                            class="btn-sm btn-warning pull-right">
-                                            <i class="voyager-eye"></i> View
+                                            <i class="voyager-eye"></i> عرض
                                         </a>
                                         {{--@endcan--}}
                                         {{--@can('update', $data)--}}
                                         <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
                                            class="btn-sm btn-primary pull-right edit">
-                                            <i class="voyager-edit"></i> Edit
+                                            <i class="voyager-edit"></i> تعديل
                                         </a>
                                         {{--@endcan--}}
                                         {{--@can('delete', $data)--}}
                                         <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
                                              id="delete-{{ $data->id }}">
-                                            <i class="voyager-trash"></i> Delete
+                                            <i class="voyager-trash"></i> حذف
                                         </div>
                                         {{--@endcan--}}
                                     </td>
@@ -107,7 +107,7 @@
             <!-- DataTables -->
     <script>
         $(document).ready(function () {
-            $('#dataTable').DataTable({"order": []});
+            $('#dataTable').DataTable();
         });
 
         $('td').on('click', '.delete', function (e) {

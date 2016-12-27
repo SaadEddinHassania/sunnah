@@ -2,14 +2,14 @@
 
 @section('page_header')
     <h1 class="page-title">
-        <i class="{{ $dataType->icon }}"></i> Viewing {{ ucfirst($dataType->display_name_singular) }}
+        <i class="{{ $dataType->icon }}"></i> عرض {{ ucfirst($dataType->display_name_singular) }}
     </h1>
 @stop
 
 @section('content')
     <div class="page-content container-fluid">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6 pull-right">
 
                 <div class="panel panel-bordered" style="padding-bottom:5px;">
 
@@ -45,10 +45,10 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 pull-left">
                 <div class="panel panel panel-bordered panel-info">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i class="icon wb-clipboard"></i>Students</h3>
+                        <h3 class="panel-title"><i class="icon wb-clipboard"></i>الطلاب</h3>
                         <div class="panel-actions">
                             <a class="panel-action icon wb-minus" data-toggle="panel-collapse"
                                aria-hidden="true"></a>
@@ -99,6 +99,7 @@
     <script>
         $(document).ready(function () {
             $('#dataTable').DataTable({
+                retrieve: true,
                 "sDom": '<"top">rt<"bottom"pi><"clear">',
                 "pageLength": 20,
                 "order": []

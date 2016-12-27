@@ -24,23 +24,23 @@
                 <div class="dimmer"></div>
                 <div class="panel-content">
                     <i class="voyager-receipt"></i>
-                    <h4>All Courses</h4>
+                    <h4>كافة الدورات</h4>
                     <form role="form"
                           action="{{ route('admin.courses.all_report') }}"
                           method="POST" enctype="multipart/form-data">
 
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary">Export</button>
+                        <button type="submit" class="btn btn-primary">تصدير</button>
                     </form>
                 </div>
             </div>
 
             <div class="panel widget center bgimage"
-                 style="background-image:url({{ config('voyager.assets_path') }}/images/widget-backgrounds/03.png);">
+                 style="background-image:url({{ config('voyager.assets_path') }}/images/widget-backgrounds/04.png);">
                 <div class="dimmer"></div>
                 <div class="panel-content">
                     <i class="voyager-news"></i>
-                    <h4>Course</h4>
+                    <h4>دورة</h4>
                     <form role="form"
                           action="{{ route('admin.courses.c_report') }}"
                           method="POST" enctype="multipart/form-data">
@@ -54,7 +54,7 @@
                             </select>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary">Export</button>
+                        <button type="submit" class="btn btn-primary">تصدير</button>
                     </form>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                 <div class="dimmer"></div>
                 <div class="panel-content">
                     <i class="voyager-categories"></i>
-                    <h4>Courses By Type</h4>
+                    <h4>الدورات حسب النوع</h4>
                     <form role="form"
                           action="{{ route('admin.courses.reports') }}"
                           method="POST" enctype="multipart/form-data">
@@ -79,7 +79,7 @@
                             </select>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary">Export</button>
+                        <button type="submit" class="btn btn-primary">تصدير</button>
                     </form>
                 </div>
             </div>
@@ -89,7 +89,7 @@
                 <div class="dimmer"></div>
                 <div class="panel-content">
                     <i class="voyager-milestone"></i>
-                    <h4>Courses By Field</h4>
+                    <h4>الدورات حسب المجال</h4>
                     <form role="form"
                           action="{{ route('admin.courses.reports') }}"
                           method="POST" enctype="multipart/form-data">
@@ -104,7 +104,7 @@
                             </select>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary">Export</button>
+                        <button type="submit" class="btn btn-primary">تصدير</button>
                     </form>
                 </div>
             </div>
@@ -116,8 +116,8 @@
                  style="background-image:url({{ config('voyager.assets_path') }}/images/widget-backgrounds/04.png);">
                 <div class="dimmer"></div>
                 <div class="panel-content">
-                    <i class="voyager-location"></i>
-                    <h4>Courses By Region</h4>
+                    <i class="voyager-down-circled"></i>
+                    <h4>الدورات حسب المنطقة</h4>
                     <form role="form"
                           action="{{ route('admin.courses.reports') }}"
                           method="POST" enctype="multipart/form-data">
@@ -132,7 +132,7 @@
                             </select>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary">Export</button>
+                        <button type="submit" class="btn btn-primary">تصدير</button>
                     </form>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                 <div class="dimmer"></div>
                 <div class="panel-content">
                     <i class="voyager-group"></i>
-                    <h4>Courses By Supervisor</h4>
+                    <h4>الدورات حسب المشرف</h4>
                     <form role="form"
                           action="{{ route('admin.courses.reports') }}"
                           method="POST" enctype="multipart/form-data">
@@ -157,7 +157,7 @@
                             </select>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary">Export</button>
+                        <button type="submit" class="btn btn-primary">تصدير</button>
                     </form>
                 </div>
             </div>
@@ -167,7 +167,7 @@
                 <div class="dimmer"></div>
                 <div class="panel-content">
                     <i class="voyager-pen"></i>
-                    <h4>Courses By Teacher</h4>
+                    <h4>الدورات حسب المدرس</h4>
                     <form role="form"
                           action="{{ route('admin.courses.reports') }}"
                           method="POST" enctype="multipart/form-data">
@@ -182,7 +182,7 @@
                             </select>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary">Export</button>
+                        <button type="submit" class="btn btn-primary">تصدير</button>
                     </form>
                 </div>
             </div>
@@ -192,7 +192,7 @@
                 <div class="dimmer"></div>
                 <div class="panel-content">
                     <i class="voyager-watch"></i>
-                    <h4>Courses By Date</h4>
+                    <h4>الدورات حسب تاريخ البداية</h4>
                     <form role="form"
                           action="{{ route('admin.courses.d_report') }}"
                           method="POST" enctype="multipart/form-data">
@@ -200,14 +200,14 @@
                         <input type="hidden" name="col" value="teacher_id"/>
                         <div class="col-sm-10 col-centered">
                             <div class="row">
-                            <label style="color: white">From: </label><input type="date" name="from"/>
+                            <label style="color: white; padding-left: 5px;">من: </label><input type="date" name="from"/>
                             </div>
                             <div class="row">
-                                <label style="color: white; padding-right: 17px;"> To: </label><input type="date" name="to"/>
+                                <label style="color: white; padding-left: 4px;">إلى: </label><input type="date" name="to"/>
                             </div>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary">Export</button>
+                        <button type="submit" class="btn btn-primary">تصدير</button>
                     </form>
                 </div>
             </div>

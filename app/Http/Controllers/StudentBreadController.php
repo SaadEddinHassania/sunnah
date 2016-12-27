@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 use TCG\Voyager\Models\DataType;
 
@@ -40,18 +41,18 @@ class StudentBreadController extends Controller
         if (Auth::user()->can('view_global', Student::class)) {
             $dataTypeContent = Student::join('users', 'users.id', 'user_id')
 //                ->where('users.is_deleted', '=', 0)
-                ->select('users.name', 'users.email','users.created_at as c_at', 'students.*')
+                ->select('users.name', 'users.email', 'users.created_at as c_at', 'students.*')
                 ->get();
         } elseif (Auth::user()->can('view_local', Student::class)) {
             $dataTypeContent = Student::where('region_id', '=', User::getRegion())
                 ->join('users', 'users.id', 'user_id')
                 ->where('users.is_deleted', '=', 0)
-                ->select('users.name', 'users.email','users.created_at as c_at', 'students.*')
+                ->select('users.name', 'users.email', 'users.created_at as c_at', 'students.*')
                 ->get();
         } else {
             return redirect('admin')
                 ->with([
-                    'message' => "sorry, You don't have permission",
+                    'message' => "نأسف لا تمتلك صلاحيات",
                     'alert-type' => 'error',
                 ]);
         }
@@ -158,7 +159,7 @@ class StudentBreadController extends Controller
         return redirect()
             ->route("{$dataType->slug}.index")
             ->with([
-                'message' => "Successfully Updated {$dataType->display_name_singular}",
+                'message' => "تم تعديل معلومات الطالب بنجاح",
                 'alert-type' => 'success',
             ]);
     }
@@ -224,7 +225,7 @@ class StudentBreadController extends Controller
         return redirect()
             ->route("{$dataType->slug}.index")
             ->with([
-                'message' => "Successfully Added New {$dataType->display_name_singular}",
+                'message' => "تم إضافة طالب جديد بنجاح",
                 'alert-type' => 'success',
             ]);
     }
@@ -276,7 +277,7 @@ class StudentBreadController extends Controller
 
         $data =
             [
-                'message' => "Successfully Deleted {$dataType->display_name_singular}",
+                'message' => "تم حذف الطالب بنجاح",
                 'alert-type' => 'success',
             ];
 
@@ -508,14 +509,37 @@ class StudentBreadController extends Controller
             ->pluck('students.user_id', 'users.name');
     }
 
-    public function getReport(Request $request)
+    public function reports(Request $request)
     {
+        if (Gate::denies('reports')) {
+            return redirect('admin')->with([
+                'message' => "نأسف لا تمتلك صلاحيات",
+                'alert-type' => 'error',
+            ]);
+        }
+
+        $col = $request->input('col');
+        $value = $request->input('value');
+
         $slug = $request->segment(2);
 
         $dataType = DataType::where('slug', '=', $slug)->first();
         $toReport = array();
         $modelName = $dataType->model_name;
-        $dataTypeContent = $modelName::all();
+
+        if (isset($col)) {
+            $dataTypeContent = $modelName::where($col, $value)->get();
+        } else {
+            $dataTypeContent = $modelName::all();
+        }
+
+        if (count($dataTypeContent) == 0) {
+            return redirect('admin/students/reports')
+                ->with([
+                    'message' => "لا يوجد طلاب بهذه الخيارات",
+                    'alert-type' => 'info',
+                ]);
+        }
 
         foreach ($dataTypeContent as $data) {
             $c = array();
@@ -539,6 +563,8 @@ class StudentBreadController extends Controller
 
             $excel->sheet($slug, function ($sheet) use ($toReport) {
                 $sheet->setRightToLeft(true);
+                $sheet->freezeFirstRow();
+                $sheet->setHeight(1, 20);
                 $sheet->fromArray($toReport);
             });
 

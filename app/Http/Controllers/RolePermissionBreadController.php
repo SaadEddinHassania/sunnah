@@ -254,11 +254,11 @@ class RolePermissionBreadController extends Controller
 
         $data = $data->destroy($id)
             ? [
-                'message' => "Successfully Deleted {$dataType->display_name_singular}",
+                'message' => "تم حذف هذه الصلاحية لهذا الدور بنجاح",
                 'alert-type' => 'success',
             ]
             : [
-                'message' => "Sorry it appears there was a problem deleting this {$dataType->display_name_singular}",
+                'message' => "حدثت بعض المشاكل عند حذف هذه الصلاحية",
                 'alert-type' => 'error',
             ];
 

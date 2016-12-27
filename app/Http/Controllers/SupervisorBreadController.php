@@ -11,6 +11,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 use TCG\Voyager\Models\DataType;
 
@@ -63,7 +64,7 @@ class SupervisorBreadController extends Controller
             } else {
                 return redirect('admin')
                     ->with([
-                        'message' => "sorry, You don't have permission",
+                        'message' => "نأسف لا تمتلك صلاحيات",
                         'alert-type' => 'error',
                     ]);
             }
@@ -83,7 +84,7 @@ class SupervisorBreadController extends Controller
             } else {
                 return redirect('admin')
                     ->with([
-                        'message' => "sorry, You don't have permission",
+                        'message' => "نأسف لا تمتلك صلاحيات",
                         'alert-type' => 'error',
                     ]);
             }
@@ -243,7 +244,7 @@ class SupervisorBreadController extends Controller
         return redirect()
             ->route("{$dataType->slug}.index")
             ->with([
-                'message' => "Successfully Updated {$dataType->display_name_singular}",
+                'message' => "تم تعديل معلومات المشرف بنجاح",
                 'alert-type' => 'success',
             ]);
     }
@@ -346,7 +347,7 @@ class SupervisorBreadController extends Controller
         return redirect()
             ->route("{$dataType->slug}.index")
             ->with([
-                'message' => "Successfully Added New {$dataType->display_name_singular}",
+                'message' => "تم اضافة مشرف جديد بنجاح",
                 'alert-type' => 'success',
             ]);
     }
@@ -410,7 +411,7 @@ class SupervisorBreadController extends Controller
 
         $data =
             [
-                'message' => "Successfully Deleted {$dataType->display_name_singular}",
+                'message' => "تم حذف المشرف بنجاح",
                 'alert-type' => 'success',
             ];
 
@@ -649,14 +650,37 @@ class SupervisorBreadController extends Controller
             ->pluck('students.user_id', 'users.name');
     }
 
-    public function getReport(Request $request)
+    public function reports(Request $request)
     {
+        if (Gate::denies('reports')) {
+            return redirect('admin')->with([
+                'message' => "نأسف لا تمتلك صلاحيات",
+                'alert-type' => 'error',
+            ]);
+        }
+
+        $col = $request->input('col');
+        $value = $request->input('value');
+
         $slug = $request->segment(2);
 
         $dataType = DataType::where('slug', '=', $slug)->first();
         $toReport = array();
         $modelName = $dataType->model_name;
-        $dataTypeContent = $modelName::all();
+
+        if (isset($col)) {
+            $dataTypeContent = $modelName::where($col, $value)->get();
+        } else {
+            $dataTypeContent = $modelName::all();
+        }
+
+        if (count($dataTypeContent) == 0) {
+            return redirect('admin/students/reports')
+                ->with([
+                    'message' => "لا يوجد مشرفين بهذه الخيارات",
+                    'alert-type' => 'info',
+                ]);
+        }
 
         foreach ($dataTypeContent as $data) {
             $c = array();
@@ -680,6 +704,8 @@ class SupervisorBreadController extends Controller
 
             $excel->sheet($slug, function ($sheet) use ($toReport) {
                 $sheet->setRightToLeft(true);
+                $sheet->freezeFirstRow();
+                $sheet->setHeight(1, 20);
                 $sheet->fromArray($toReport);
             });
 

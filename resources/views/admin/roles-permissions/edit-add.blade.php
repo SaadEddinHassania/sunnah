@@ -7,7 +7,7 @@
 
 @section('page_header')
     <h1 class="page-title">
-        <i class="{{ $dataType->icon }}"></i> @if(isset($dataTypeContent->id)){{ 'Edit' }}@else{{ 'New' }}@endif {{ $dataType->display_name_singular }}
+        <i class="{{ $dataType->icon }}"></i>{{ $dataType->display_name_singular }} @if(isset($dataTypeContent->id)){{ 'تعديل' }}@else{{ 'جديد' }}@endif
     </h1>
 @stop
 <?php $region_id = 0;?>
@@ -23,7 +23,7 @@
                       method="POST" enctype="multipart/form-data">
 
                     <div class="row">
-                        <div class="col-md-7">
+                        <div class="col-md-12">
                             <div class="panel panel-body panel-bordered">
 
                                 @if (count($errors) > 0)
