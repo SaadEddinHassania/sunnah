@@ -11,9 +11,9 @@ class CourseTypeTableSeed extends Seeder
      */
     public function run()
     {
-        \DB::table('roles')->delete();
+        \DB::table('courses_types')->delete();
 
-        \DB::table('roles')->insert(
+        \DB::table('courses_types')->insert(
             array(
                 array('id' => '1', 'name' => 'حتى 12 ساعة', 'created_at' => '2016-12-20 20:44:21', 'updated_at' => '2016-12-20 20:44:21'),
                 array('id' => '2', 'name' => 'من 13 الى 24 ساعة', 'created_at' => '2016-12-20 20:44:26', 'updated_at' => '2016-12-20 20:44:31'),
