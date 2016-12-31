@@ -12,6 +12,7 @@
 */
 
 use App\Models\Course;
+use JasperPHP\JasperPHP;
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,9 +20,67 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('test', function () {
-    return \App\Models\Student::all();
-    return Course::with('students')->get();
+Route::get('testc', function () {
+
+//        λ jasperstarter process c:\laragon\www\daralquran\vendor\cossou\jasperphp\examples\hello_world.jrxml -t xml --xml-xpath /Course/Students/Student --data-file c:\laragon\www\daralquran\vendor\cossou\jasperphp\examples\newfile.xml -f pdf
+//        jasperstarter process c:\laragon\www\daralquran\vendor\cossou\jasperphp\examples\hello_world.jrxml --xml-xpath c:\laragon\www\daralquran\vendor\cossou\jasperphp\examples\newfile.xml -f pdf
+//    $course = Course::find($id);
+//    $students = $course->students()->get();
+//
+//    $xml = new XMLWriter();
+//    $xml->openMemory();
+//    $xml->startDocument();
+//    $xml->startElement('Course');
+//    $xml->writeElement('date', Carbon::now()->toDateString());
+//    $xml->writeElement('number', $course->number);
+//    $xml->writeElement('course_type', $course->courseType()->first()->name);
+//    $xml->writeElement('hours', $course->hours);
+//    $xml->writeElement('start_date', $course->start_date);
+//    $xml->writeElement('finish_date', $course->finish_date);
+//    $xml->startElement('Students');
+//    foreach ($students as $student) {
+//        $xml->startElement('Student');
+//        $xml->writeElement('name', $student->name);
+//        $xml->writeElement('placeOfBirth', $student->placeOfBirth);
+//        $xml->writeElement('dob', $student->dob);
+//        $xml->writeElement('rating', Rating::find($students->first()->pivot->rating_id)->name);
+//        $xml->endElement();
+//    }
+//    $xml->endElement();
+//    $xml->endElement();
+//    $xml->endDocument();
+//
+//    $content = $xml->outputMemory();
+//    $xml = null;
+//
+//    Storage::disk('local')->put('reports/xmls/'.$course->courseType->id.'-'.$course->number.'.xml', $content);
+
+//    $xml_path = storage_path('app\\reports\\xmls\\'.$course->courseType->id.'-'.$course->number.'.xml');
+    $xml_path = storage_path('app\\reports\\xmls\\5-38.xml');
+
+//    $output_path = storage_path('app\\reports\\pdfs\\'.$course->courseType->id.'-'.$course->number);
+    $output_path = storage_path('app\\reports\\pdfs\\5-38');
+    $jasper = new JasperPHP;
+
+    $jasper->processXML(
+//        storage_path('app\\reports\\jrxmls\\'.$course->courseType->id.'.jrxml'),
+        storage_path('app\\reports\\jrxmls\\5.jrxml'),
+        $output_path,
+        array("pdf"),
+        $xml_path,
+        '/Course/Students/Student'
+    )->execute();
+    $headers = array(
+        'Content-Type: application/pdf',
+    );
+
+
+    return \Response::make(file_get_contents($output_path.'.pdf'), 200, [
+        'Content-Type' => 'application/pdf',
+//        'Content-Disposition' => 'inline; filename="'.$course->courseType->id.'-'.$course->number.'.pdf'.'"'
+        'Content-Disposition' => 'inline; filename="5-38.pdf'.'"'
+    ]);
+//        return response()->download($output_path.'.pdf', $course->id.'-'.$course->number.'.pdf', $headers);
 });
 
 Route::get('/home', 'HomeController@index');

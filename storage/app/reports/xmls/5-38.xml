@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<Course><date>2016-11-23</date><number>38</number><course_type>تأهيلية</course_type><hours/><start_date>2016-11-12</start_date><finish_date>2016-12-11</finish_date><Students><Student><name>سعد</name><placeOfBirth>غزة</placeOfBirth><dob>2016-11-16</dob><rating>ممتاز</rating></Student><Student><name>saad</name><placeOfBirth>الرمال</placeOfBirth><dob>2016-11-15</dob><rating>ممتاز</rating></Student><Student><name>زيد</name><placeOfBirth>غزة شارع اليرموك</placeOfBirth><dob>2016-11-09</dob><rating>ممتاز</rating></Student></Students></Course>
