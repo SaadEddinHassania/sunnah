@@ -38,5 +38,10 @@ class Permission extends Model
         return Permission::where('policy_name', $policy_name)->get();
     }
 
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'roles_permissions');
+    }
+
 
 }

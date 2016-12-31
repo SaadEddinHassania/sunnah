@@ -23,4 +23,9 @@ class Role extends Model
     {
         return Role::pluck('display_name', 'id');
     }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'roles_permissions');
+    }
 }

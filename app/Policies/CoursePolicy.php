@@ -193,6 +193,8 @@ class CoursePolicy
 
         return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId('view', class_basename(__CLASS__)))
+            ->exists() || Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+            ->where('permission_id', '=', Permission::getId('view_concerning', class_basename(__CLASS__)))
             ->exists();
     }
 

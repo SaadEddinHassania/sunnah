@@ -148,7 +148,7 @@
                                     <!-- CSRF TOKEN -->
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                             <div class="panel-footer">
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="submit" class="btn btn-primary">حفظ</button>
                             </div>
                     </form>
 

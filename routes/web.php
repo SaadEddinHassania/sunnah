@@ -40,25 +40,25 @@ Route::group(['middleware' => ['web', 'admin.user'], 'prefix' => 'admin'], funct
     Route::post('courses/course-report/', 'CourseBreadController@getCourseReport')->name('admin.courses.c_report');
     Route::post('courses/reports/date/', 'CourseBreadController@reportCoursesByDate')->name('admin.courses.d_report');
 
-    Route::get('courses/reports/', function(){
+    Route::get('courses/reports/', function () {
         return view('admin.courses.reports');
     })->middleware('can:reports');
 
-    Route::get('students/reports/', function(){
+    Route::get('students/reports/', function () {
         return view('admin.students.reports');
     })->middleware('can:reports');
 
-    Route::get('supervisors/reports/', function(){
+    Route::get('supervisors/reports/', function () {
         return view('admin.supervisors.reports');
     })->middleware('can:reports');
 
-    Route::get('roles_p', function(){
+    Route::get('roles_p', function () {
         return view('admin.roles-permissions.index');
     });
 
-    Route::post('courses/reports/','CourseBreadController@reports')->name('admin.courses.reports');;
-    Route::post('students/reports/','StudentBreadController@reports')->name('admin.students.reports');;
-    Route::post('supervisors/reports/','SupervisorBreadController@reports')->name('admin.supervisors.reports');;
+    Route::post('courses/reports/', 'CourseBreadController@reports')->name('admin.courses.reports');
+    Route::post('students/reports/', 'StudentBreadController@reports')->name('admin.students.reports');
+    Route::post('supervisors/reports/', 'SupervisorBreadController@reports')->name('admin.supervisors.reports');
 
 
     if (env('DB_CONNECTION') !== null && Schema::hasTable('data_types')):
@@ -70,7 +70,9 @@ Route::group(['middleware' => ['web', 'admin.user'], 'prefix' => 'admin'], funct
             } elseif ($dataTypes->slug == 'supervisors' || $dataTypes->slug == 'teachers') {
                 Route::resource($dataTypes->slug, '\App\Http\Controllers\SupervisorBreadController');
             } elseif ($dataTypes->slug == 'roles-permissions') {
-                Route::resource($dataTypes->slug, '\App\Http\Controllers\RolePermissionBreadController');
+                Route::get('roles-permissions/', 'RolePermissionController@index')->name('admin.roles-permissions.index');
+                Route::get('roles-permissions/tbody/{role_id}', 'RolePermissionController@tablePermissions');
+                Route::post('roles-permissions/update/', 'RolePermissionController@update')->name('admin.roles-permissions.update');
             } else {
                 Route::resource($dataTypes->slug, '\TCG\Voyager\Http\Controllers\VoyagerBreadController');
             }

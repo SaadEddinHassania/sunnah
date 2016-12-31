@@ -44,8 +44,8 @@ class SupervisorBreadController extends Controller
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         if ($request->segment(2) == 'teachers') {
-            $dataType->display_name_plural = 'Teachers';
-            $dataType->display_name_singular = 'Teacher';
+            $dataType->display_name_plural = 'المدرسين';
+            $dataType->display_name_singular = 'مدرس';
             $dataType->slug = 'teachers';
 
             if (Auth::user()->can('view_teacher_global', Supervisor::class)) {
@@ -125,8 +125,8 @@ class SupervisorBreadController extends Controller
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         if ($request->segment(2) == 'teachers') {
-            $dataType->display_name_plural = 'Teachers';
-            $dataType->display_name_singular = 'Teacher';
+            $dataType->display_name_plural = 'المدرسين';
+            $dataType->display_name_singular = 'مدرس';
             $dataType->slug = 'teachers';
         }
 
@@ -175,8 +175,8 @@ class SupervisorBreadController extends Controller
             : DB::table($dataType->name)->where('id', $id)->first(); // If Model doest exist, get data from table name
 
         if ($request->segment(2) == 'teachers') {
-            $dataType->display_name_plural = 'Teachers';
-            $dataType->display_name_singular = 'Teacher';
+            $dataType->display_name_plural = 'المدرسين';
+            $dataType->display_name_singular = 'مدرس';
             $dataType->slug = 'teachers';
             $this->authorize('update_teacher', $dataTypeContent);
         } else {
@@ -229,8 +229,8 @@ class SupervisorBreadController extends Controller
         $data = call_user_func([$dataType->model_name, 'find'], $id);
 
         if ($request->segment(2) == 'teachers') {
-            $dataType->display_name_plural = 'Teachers';
-            $dataType->display_name_singular = 'Teacher';
+            $dataType->display_name_plural = 'المدرسين';
+            $dataType->display_name_singular = 'مدرس';
             $dataType->slug = 'teachers';
         }
 
@@ -276,19 +276,19 @@ class SupervisorBreadController extends Controller
         }
 
         $dataType = DataType::where('slug', '=', $slug)->first();
-        
+
         if ($request->segment(2) == 'teachers') {
-            $dataType->display_name_plural = 'Teachers';
-            $dataType->display_name_singular = 'Teacher';
+            $dataType->display_name_plural = 'المدرسين';
+            $dataType->display_name_singular = 'مدرس';
             $dataType->slug = 'teachers';
-            $role = ['Teacher'];
+            $role = ['مدرس'];
 
             if (Auth::user()->can('create_teacher_global', Supervisor::class)) {
                 $region = Region::toDropDown();
             } else {
                 $region = [getNameById('region', \App\User::getRegion())];
             }
-        }else{
+        } else {
             if (Auth::user()->can('create_global', Supervisor::class)) {
                 $region = Region::toDropDown();
             } else {
@@ -296,7 +296,6 @@ class SupervisorBreadController extends Controller
             }
             $role = Role::toDropDown();
         }
-
 
 
         $options_ = array(
@@ -335,8 +334,8 @@ class SupervisorBreadController extends Controller
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         if ($request->segment(2) == 'teachers') {
-            $dataType->display_name_plural = 'Teachers';
-            $dataType->display_name_singular = 'Teacher';
+            $dataType->display_name_plural = 'المدرسين';
+            $dataType->display_name_singular = 'مدرس';
             $dataType->slug = 'teachers';
         }
 
@@ -381,8 +380,8 @@ class SupervisorBreadController extends Controller
         $user_id = $data->user_id;
 
         if ($request->segment(2) == 'teachers') {
-            $dataType->display_name_plural = 'Teachers';
-            $dataType->display_name_singular = 'Teacher';
+            $dataType->display_name_plural = 'المدرسين';
+            $dataType->display_name_singular = 'مدرس';
             $dataType->slug = 'teachers';
         }
 
@@ -675,7 +674,7 @@ class SupervisorBreadController extends Controller
         }
 
         if (count($dataTypeContent) == 0) {
-            return redirect('admin/students/reports')
+            return redirect('admin/' . $slug . '/reports')
                 ->with([
                     'message' => "لا يوجد مشرفين بهذه الخيارات",
                     'alert-type' => 'info',
@@ -689,7 +688,7 @@ class SupervisorBreadController extends Controller
                     $c[$row->display_name] = getNameById($row->field, $data->{$row->field});
                 } elseif ($row->field == 'name') {
                     $c[$row->display_name] = $data->user->name;
-                }elseif ($row->field == 'email') {
+                } elseif ($row->field == 'email') {
                     $c[$row->display_name] = $data->user->email;
                 } else {
                     $c[$row->display_name] = $data->{$row->field};

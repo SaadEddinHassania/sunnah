@@ -19,7 +19,7 @@ class CreateRolesPermissionsTable extends Migration
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
             $table->integer('permission_id')->unsigned()->index();
             $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('cascade');
-            $table->integer('global');
+            $table->integer('global')->default('0');
         });
     }
 

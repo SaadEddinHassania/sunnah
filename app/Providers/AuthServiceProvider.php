@@ -87,7 +87,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('courses-types', function () {
-            return User::hasPermission('courses-types');
+            return Auth::user()->isAdmin();
         });
 
         Gate::define('regions', function () {

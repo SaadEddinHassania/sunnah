@@ -93,7 +93,7 @@
                                             </a>
                                             @endcan
                                             @can('delete', $data)
-                                            <div class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
+                                            <div onclick="deleteRow(this)" class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
                                                  id="delete-{{ $data->id }}">
                                                 <i class="voyager-trash"></i> حذف
                                             </div>
@@ -140,13 +140,13 @@
             $('#dataTable').DataTable();
         });
 
-        $('td').on('click', '.delete', function (e) {
+        function deleteRow(div) {
             var form = $('#delete_form')[0];
 
-            form.action = parseActionUrl(form.action, $(this).data('id'));
+            form.action = parseActionUrl(form.action, $(div).data('id'));
 
             $('#delete_modal').modal('show');
-        });
+        }
 
         function parseActionUrl(action, id) {
             return action.match(/\/[0-9]+$/)
