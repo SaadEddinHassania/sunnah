@@ -69,6 +69,11 @@ class Course extends Model
         return $this->belongsToMany(User::class);
     }
 
+    public function type()
+    {
+        return $this->belongsTo(CourseType::class);
+    }
+
     public function region()
     {
         return $this->belongsTo(Region::class);

@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Course_Type extends Model
+class CourseType extends Model
 {
     protected $table = 'courses_types';
 
     public static function getName($id)
     {
-        return Course_Type::where('id', '=', $id)
+        return CourseType::where('id', '=', $id)
             ->select('name')
             ->first()
             ->name;
@@ -18,6 +18,6 @@ class Course_Type extends Model
 
     public static function toDropDown()
     {
-        return Course_Type::pluck('name', 'id');
+        return CourseType::pluck('name', 'id');
     }
 }

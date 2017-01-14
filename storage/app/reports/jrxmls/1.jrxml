@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-11-18T04:55:08 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcuseCancelacion" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="041fd329-b27d-44e2-9712-5d45bbb4cabd">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="XML_Acuse_Cancelacion"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<queryString language="xPath">
+		<![CDATA[/Course/Students/Student]]>
+	</queryString>
+	<field name="date" class="java.lang.String">
+		<fieldDescription><![CDATA[/Course/date]]></fieldDescription>
+	</field>
+	<field name="number" class="java.lang.String">
+		<fieldDescription><![CDATA[/Course/number]]></fieldDescription>
+	</field>
+	<field name="name" class="java.lang.String">
+		<fieldDescription><![CDATA[name]]></fieldDescription>
+	</field>
+	<field name="placeOfBirth" class="java.lang.String">
+		<fieldDescription><![CDATA[placeOfBirth]]></fieldDescription>
+	</field>
+	<field name="dob" class="java.lang.String">
+		<fieldDescription><![CDATA[dob]]></fieldDescription>
+	</field>
+	<field name="hours" class="java.lang.String">
+		<fieldDescription><![CDATA[/Course/hours]]></fieldDescription>
+	</field>
+	<field name="course_type" class="java.lang.String">
+		<fieldDescription><![CDATA[/Course/course_type]]></fieldDescription>
+	</field>
+	<field name="start_date" class="java.lang.String">
+		<fieldDescription><![CDATA[/Course/start_date]]></fieldDescription>
+	</field>
+	<field name="finish_date" class="java.lang.String">
+		<fieldDescription><![CDATA[/Course/finish_date]]></fieldDescription>
+	</field>
+	<field name="rating" class="java.lang.String">
+		<fieldDescription><![CDATA[rating]]></fieldDescription>
+	</field>
+	<detail>
+		<band height="595" splitType="Stretch">
+			<textField>
+				<reportElement x="700" y="10" width="100" height="30" uuid="74cb325c-901a-4ca0-a497-106b09710886"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="700" y="70" width="100" height="30" uuid="69e745ec-e38e-4073-bb2e-2e4e3e069de9"/>
+				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="690" y="180" width="100" height="30" uuid="30691861-71c7-4f20-b5b9-de51c1a0c44d"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="130" width="100" height="30" uuid="08a09e78-fb7a-4670-897d-670df3feede5"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{placeOfBirth}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="723" y="260" width="100" height="30" uuid="08fd88e4-072d-4035-985b-72e69bc27505"/>
+				<textFieldExpression><![CDATA[$F{dob}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="490" y="270" width="100" height="30" uuid="2bfd77cb-fa5f-42a9-8128-96547b5a0791"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{course_type}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="670" y="340" width="100" height="30" uuid="29da08b1-d39c-4534-88b9-9e58cf15b2ef"/>
+				<textFieldExpression><![CDATA[$F{hours}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="310" y="460" width="100" height="30" uuid="ee70b323-273d-462b-9aa0-e5ca2fed0aa9"/>
+				<textFieldExpression><![CDATA[$F{start_date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="360" width="100" height="30" uuid="ab8bd5fc-99af-4e13-87f5-9b6c7e3088be"/>
+				<textFieldExpression><![CDATA[$F{finish_date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="625" y="435" width="100" height="30" uuid="ca79b42d-db2b-487c-9200-20186c3d2f97"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rating}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
-use App\Models\Course_Field;
+use App\Models\CourseField;
 use App\Models\CourseUser;
-use App\Models\Course_Type;
+use App\Models\CourseType;
 use App\Models\Region;
 use App\Models\Student;
 use App\Models\Supervisor;
@@ -141,8 +141,8 @@ class CourseBreadController extends Controller
             'teacher' => $teachers,
             'region' => [getNameById('region', $dataTypeContent->region_id)],
             'venue' => Venue::toDropDown(),
-            'field' => Course_Field::toDropDown(),
-            'type' => Course_Type::toDropDown(),
+            'field' => CourseField::toDropDown(),
+            'type' => CourseType::toDropDown(),
             'students' => Student::getStudentsByCourse($dataTypeContent->id)->toArray()
         );
         $options_ = json_encode($options_);
@@ -224,8 +224,8 @@ class CourseBreadController extends Controller
             'teacher' => $teachers,
             'region' => $region,
             'venue' => Venue::toDropDown(),
-            'field' => Course_Field::toDropDown(),
-            'type' => Course_Type::toDropDown()
+            'field' => CourseField::toDropDown(),
+            'type' => CourseType::toDropDown()
         );
         $options_ = json_encode($options_);
 

@@ -71,7 +71,7 @@
 
                         <input type="hidden" name="col" value="type_id"/>
                         <div class="col-sm-10 col-centered">
-                            <?php $types = \App\Models\Course_Type::toDropDown()?>
+                            <?php $types = \App\Models\CourseType::toDropDown()?>
                             <select name="value" class='form-control'>
                                 @foreach($types as $key => $value)
                                     <option value="{{$key}}">{{$value}}</option>
@@ -96,7 +96,7 @@
 
                         <input type="hidden" name="col" value="field_id"/>
                         <div class="col-sm-10 col-centered">
-                            <?php $types = \App\Models\Course_Field::toDropDown()?>
+                            <?php $types = \App\Models\CourseField::toDropDown()?>
                             <select name="value" class='form-control'>
                                 @foreach($types as $key => $value)
                                     <option value="{{$key}}">{{$value}}</option>

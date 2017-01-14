@@ -7,7 +7,6 @@ use App\Models\Role_Permission;
 use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\Teacher;
-use App\Models\User_Role;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -57,10 +56,7 @@ class User extends Authenticatable
 
     public function is_admin()
     {
-        if (count($this->supervisor)) {
-            return true;
-        }
-        return false;
+        return Auth::user()->is_admin;
     }
 
     public function permissions()
@@ -101,12 +97,7 @@ class User extends Authenticatable
 
     public static function isAdmin()
     {
-        $stc = Student::where('user_id', '=', Auth::user()->id)->count();
-        $spc = Supervisor::where('user_id', '=', Auth::user()->id)->count();
-        if ($stc == 0 && $spc == 0) {
-            return true;
-        }
-        return false;
+        return Auth::user()->is_admin;
     }
 
     public static function getRegion()

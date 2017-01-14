@@ -10,7 +10,7 @@ function getNameById($field, $id)
 {
     $model_name = ucfirst(explode('_', $field)[0]);
     if ($model_name == 'Field' || $model_name == 'Type') {
-        $model_name = 'Course_' . $model_name;
+        $model_name = 'Course' . $model_name;
     }
     $c = '\App\Models\\' . $model_name;
     error_log($c);

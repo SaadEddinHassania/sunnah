@@ -48,16 +48,18 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($exception instanceof AuthorizationException || $exception instanceof ErrorException) {
-            $c = Student::where('user_id', '=', Auth::user()->id)->count();
-            if ($c > 0) {
-                return redirect('home');
-            }
-            return redirect('admin')->with([
-                'message' => "نأسف لا تمتلك صلاحيات",
-                'alert-type' => 'error',
-            ]);
-        }
+//        if ($exception instanceof AuthorizationException || $exception instanceof ErrorException) {
+//
+//            dd($exception);
+//            $c = Student::where('user_id', '=', Auth::user()->id)->count();
+//            if ($c > 0) {
+//                return redirect('home');
+//            }
+//            return redirect('admin')->with([
+//                'message' => "نأسف لا تمتلك صلاحيات",
+//                'alert-type' => 'error',
+//            ]);
+//        }
         return parent::render($request, $exception);
     }
 

@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Course;
-use App\Models\Course_Type;
+use App\Models\CourseType;
 use App\Models\Permission;
 use App\Models\Role_Permission;
 use App\User;
@@ -181,7 +181,7 @@ class CoursePolicy
     public function delete_concerning(User $user)
     {
         if (User::isAdmin()) return true;
-        
+
         return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->exists();
