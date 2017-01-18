@@ -102,10 +102,6 @@ Route::group(['middleware' => ['web', 'admin.user'], 'prefix' => 'admin'], funct
     Route::post('courses/course-report/', 'CourseBreadController@getCourseReport')->name('admin.courses.c_report');
     Route::post('courses/reports/date/', 'CourseBreadController@reportCoursesByDate')->name('admin.courses.d_report');
 
-    Route::get('courses/reports/', function () {
-        return view('admin.courses.reports');
-    })->middleware('can:reports');
-
     Route::get('students/reports/', function () {
         return view('admin.students.reports');
     })->middleware('can:reports');
@@ -118,6 +114,7 @@ Route::group(['middleware' => ['web', 'admin.user'], 'prefix' => 'admin'], funct
         return view('admin.roles-permissions.index');
     });
 
+    Route::get('courses/reports/', 'CourseBreadController@show_reports')->name('admin.courses.reports');
     Route::post('courses/reports/', 'CourseBreadController@reports')->name('admin.courses.reports');
     Route::post('students/reports/', 'StudentBreadController@reports')->name('admin.students.reports');
     Route::post('supervisors/reports/', 'SupervisorBreadController@reports')->name('admin.supervisors.reports');
