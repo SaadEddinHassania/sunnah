@@ -94,4 +94,9 @@ class Course extends Model
         return $this->belongsTo(Venue::class);
     }
 
+    public function status()
+    {
+        return $this->belongsTo(CourseStatus::class);
+    }
+
 }

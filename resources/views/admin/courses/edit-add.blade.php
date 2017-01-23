@@ -150,10 +150,12 @@
                                 @endforeach
 
                                 <div class="panel-footer">
-                                    <button type="submit" class="btn btn-primary">حفظ</button>
+                                    <button type="submit" name="edit" value="edit" class="btn btn-primary">حفظ</button>
+
+                                    @if(isset($dataTypeContent->id) && \Illuminate\Support\Facades\Auth::user()->supervisor->role_id < 9)
+                                        <button type="submit" name="migrate" value="migrate" class="btn btn-danger">ترحيل</button>
+                                    @endif
                                 </div>
-
-
                             </div><!-- panel-body -->
                         </div>
 

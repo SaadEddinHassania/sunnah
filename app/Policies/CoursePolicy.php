@@ -6,8 +6,10 @@ use App\Models\Course;
 use App\Models\CourseType;
 use App\Models\Permission;
 use App\Models\Role_Permission;
+use App\Models\RoleCourseStutes;
 use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Support\Facades\Auth;
 use TCG\Voyager\Models\Role;
 
 class CoursePolicy
@@ -33,16 +35,15 @@ class CoursePolicy
 
         if ($global === null) {
             if ($this->view_concerning($user)) {
-                return $course->supervisor_id == $user->id || $course->teacher_id == $user->id;
+                return ($course->supervisor_id == $user->id || $course->teacher_id == $user->id) &&
+                $course->status_id <= RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
             }
             return false;
         } elseif ($global) {
-            return true;
+            return $course->status_id <= RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
         } else {
-            return $user->join('supervisors', 'users.id', 'supervisors.user_id')
-                ->where('supervisors.user_id', '=', $user->id)
-                ->where('supervisors.region_id', '=', $course->region_id)
-                ->exists();
+            return $user->supervisor->region_id == $course->region_id &&
+            $course->status_id <= RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
         }
     }
 
@@ -79,16 +80,15 @@ class CoursePolicy
 
         if ($global === null) {
             if ($this->update_concerning($user)) {
-                return $course->supervisor_id == $user->id || $course->teacher_id == $user->id;
+                return ($course->supervisor_id == $user->id || $course->teacher_id == $user->id) &&
+                $course->status_id <= RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
             }
             return false;
         } elseif ($global) {
-            return true;
+            return $course->status_id <= RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
         } else {
-            return $user->join('supervisors', 'users.id', 'supervisors.user_id')
-                ->where('supervisors.user_id', '=', $user->id)
-                ->where('supervisors.region_id', '=', $course->region_id)
-                ->exists();
+            return $user->supervisor->region_id == $course->region_id &&
+            $course->status_id <= RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
         }
     }
 
@@ -103,23 +103,22 @@ class CoursePolicy
     {
         if (User::isAdmin()) return true;
 
-        $global = Role_Permission::where('role_id', '=', User::getRoleId($user->id))
+        $global = Role_Permission::where('role_id', '=', Auth::user()->supervisor->role_id)
             ->where('permission_id', '=', Permission::getId(__FUNCTION__, class_basename(__CLASS__)))
             ->select('global')
             ->first();
 
         if ($global === null) {
-            if ($this->view_concerning($user)) {
-                return $course->supervisor_id == $user->id || $course->teacher_id == $user->id;
+            if ($this->delete_concerning($user)) {
+                return ($course->supervisor_id == $user->id || $course->teacher_id == $user->id) &&
+                $course->status_id <= RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
             }
             return false;
         } elseif ($global) {
-            return true;
+            return $course->status_id <= RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
         } else {
-            return $user->join('supervisors', 'users.id', 'supervisors.user_id')
-                ->where('supervisors.user_id', '=', $user->id)
-                ->where('supervisors.region_id', '=', $course->region_id)
-                ->exists();
+            return $user->supervisor->region_id == $course->region_id &&
+            $course->status_id <= RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
         }
     }
 
@@ -135,8 +134,6 @@ class CoursePolicy
 
     public function view_global(User $user)
     {
-        if (User::isAdmin()) return true;
-
         return Role_Permission::where('role_id', '=', User::getRoleId($user->id))
             ->where('permission_id', '=', Permission::getId('view', class_basename(__CLASS__)))
             ->where('global', '=', 1)

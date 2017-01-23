@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddIsAdminUser extends Migration
+class CreateCourseStatusTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class AddIsAdminUser extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_admin')->default('0');
+        Schema::create('course_status', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->boolean('revocable')->default('0');
         });
     }
 
@@ -25,8 +27,6 @@ class AddIsAdminUser extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('is_admin');
-        });
+        Schema::dropIfExists('course_status');
     }
 }

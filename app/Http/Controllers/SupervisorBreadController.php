@@ -36,7 +36,7 @@ class SupervisorBreadController extends Controller
         $slug = $request->segment(2);
 
         if ($slug == 'teachers') {
-            $this->role_id = 3;
+            $this->role_id = 9;
             $slug = 'supervisors';
         }
 
@@ -264,7 +264,6 @@ class SupervisorBreadController extends Controller
 
     public function create(Request $request)
     {
-
         $slug = $request->segment(2);
 
         if ($slug == 'teachers') {
@@ -294,7 +293,12 @@ class SupervisorBreadController extends Controller
             } else {
                 $region = [getNameById('region', \App\User::getRegion())];
             }
-            $role = Role::toDropDown();
+
+            if (Auth::user()->is_admin) {
+                $role = Role::toDropDown();
+            } else {
+                $role = Role::where('id', '>', Auth::user()->supervisor->role_id)->pluck('display_name', 'id');
+            }
         }
 
 

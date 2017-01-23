@@ -44,7 +44,7 @@ class RolePermissionController extends Controller
 
         $policies = [
             'StudentPolicy' => 'الطلاب',
-            'SupervisorPolicy' => 'المشرفين',
+            'SupervisorPolicy' => 'المشرفين - المدرسين',
             'CoursePolicy' => 'الدورات',
             'SpecializationsPolicy' => 'التخصصات',
             'QualificationsPolicy' => 'المؤهلات العلمية',

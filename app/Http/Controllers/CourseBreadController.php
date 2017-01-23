@@ -8,6 +8,7 @@ use App\Models\CourseUser;
 use App\Models\CourseType;
 use App\Models\Region;
 use App\Models\Role_Permission;
+use App\Models\RoleCourseStutes;
 use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\Teacher;
@@ -47,13 +48,18 @@ class CourseBreadController extends Controller
         $dataType = DataType::where('slug', '=', $slug)->first();
 
         // Next Get the actual content from the MODEL that corresponds to the slug DataType
-        if (Auth::user()->can('view_global', Course::class)) {
+        if (Auth::user()->is_admin) {
             $dataTypeContent = Course::all();
+        } elseif (Auth::user()->can('view_global', Course::class)) {
+            $dataTypeContent = Course::where('status_id', '>=', RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id'))->get();
         } elseif (Auth::user()->can('view_local', Course::class)) {
-            $dataTypeContent = Course::where('region_id', '=', User::getRegion())->get();
+            $dataTypeContent = Course::where('region_id', '=', User::getRegion())
+                ->where('status_id', '>=', RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id'))
+                ->get();
         } elseif (Auth::user()->can('view_concerning', Course::class)) {
             $dataTypeContent = Course::where('supervisor_id', Auth::user()->id)
                 ->orWhere('teacher_id', Auth::user()->id)
+                ->where('status_id', '>=', RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id'))
                 ->get();
         } else {
             return redirect('admin')
@@ -63,6 +69,7 @@ class CourseBreadController extends Controller
                 ]);
         }
 
+        $user_status_id = RoleCourseStutes::where('role_id', Auth::user()->supervisor->role_id)->value('status_id');
         $view = 'voyager::bread.browse';
 
         if (view()->exists("admin.$slug.browse")) {
@@ -71,7 +78,7 @@ class CourseBreadController extends Controller
             $view = "voyager::$slug.browse";
         }
 
-        return view($view, compact('dataType', 'dataTypeContent'));
+        return view($view, compact('dataType', 'dataTypeContent', 'user_status_id'));
     }
 
     //***************************************
@@ -330,6 +337,10 @@ class CourseBreadController extends Controller
 
         if (isset($data->id)) {
             $region_id = $data->region_id;
+            $status_id = $data->status_id;
+            if ($request->input('migrate')) {
+                $status_id = $data->status_id + 1;
+            }
             $check_function = 'update_concerning';
         } else {
             if (Auth::user()->can('create_global', Student::class)) {
@@ -337,6 +348,7 @@ class CourseBreadController extends Controller
             } else {
                 $region_id = User::getRegion();
             }
+            $status_id = 1;
             $check_function = 'create_concerning';
         }
 
@@ -377,6 +389,7 @@ class CourseBreadController extends Controller
         $data->teacher_id = $teacher_id;
         $data->supervisor_id = $supervisor_id;
         $data->region_id = $region_id;
+        $data->status_id = $status_id;
 
         DB::transaction(function () use ($data, $request) {
             $data->save();
@@ -548,14 +561,14 @@ class CourseBreadController extends Controller
                 ->where('func_name', '=', 'reports')
                 ->where('global', '1')
                 ->exists();
-            if ($is_global){
+            if ($is_global) {
                 $courses = Course::toDropDown();
                 $regions = Region::toDropDown();
-            }else{
+            } else {
                 $courses = Course::where('region_id', Auth::user()->supervisor->region_id)->pluck('name', 'id');
                 $regions = Region::where('id', Auth::user()->supervisor->region_id)->pluck('name', 'id');
             }
-        }else {
+        } else {
             $courses = Course::toDropDown();
             $regions = Region::toDropDown();
         }
@@ -609,12 +622,12 @@ class CourseBreadController extends Controller
                     ->where('func_name', '=', 'reports')
                     ->where('global', '1')
                     ->exists();
-                if ($is_global){
+                if ($is_global) {
                     $dataTypeContent = $modelName::all();
-                }else{
+                } else {
                     $dataTypeContent = $modelName::where('region_id', Auth::user()->supervisor->region_id)->get();
                 }
-            }else {
+            } else {
                 $dataTypeContent = $modelName::all();
             }
 

@@ -28,4 +28,8 @@ class Role extends Model
     {
         return $this->belongsToMany(Permission::class, 'roles_permissions');
     }
+
+    public function RoleCourseStatus(){
+        return $this->hasOne(RoleCourseStutes::class);
+    }
 }

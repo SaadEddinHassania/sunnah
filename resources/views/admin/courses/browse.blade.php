@@ -62,13 +62,17 @@
                                         </a>
                                         @endcan
                                         @can('update', $data)
-                                        <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
-                                           class="btn-sm btn-primary pull-right edit">
-                                            <i class="voyager-edit"></i> تعديل
-                                        </a>
+                                        @if($user_status_id == $data->statud_id)
+                                            <a href="{{ route($dataType->slug.'.edit', $data->id) }}"
+                                               class="btn-sm btn-primary pull-right edit">
+                                                <i class="voyager-edit"></i> تعديل
+                                            </a>
+                                        @endif
                                         @endcan
                                         @can('delete', $data)
-                                        <div onclick="deleteRow(this)" class="btn-sm btn-danger pull-right delete" data-id="{{ $data->id }}"
+
+                                        <div onclick="deleteRow(this)" class="btn-sm btn-danger pull-right delete"
+                                             data-id="{{ $data->id }}"
                                              id="delete-{{ $data->id }}">
                                             <i class="voyager-trash"></i> حذف
                                         </div>
